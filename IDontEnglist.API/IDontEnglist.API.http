@@ -1,0 +1,6 @@
+@IDontEnglist.API_HostAddress = http://localhost:5152
+
+GET {{IDontEnglist.API_HostAddress}}/cateogries/
+Accept: application/json
+
+###
