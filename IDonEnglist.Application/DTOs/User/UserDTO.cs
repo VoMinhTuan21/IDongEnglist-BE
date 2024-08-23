@@ -3,7 +3,7 @@ using IDonEnglist.Application.DTOs.Role;
 
 namespace IDonEnglist.Application.DTOs.User
 {
-    public class UserDTO : BaseDTO
+    public class UserDTO : BaseDTO, IUserDTO
     {
         public string? Email { get; set; }
         public string? Phone { get; set; }

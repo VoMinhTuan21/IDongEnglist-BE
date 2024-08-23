@@ -15,18 +15,18 @@ namespace IDonEnglist.Application.Features.Categories.Commands
 
     public class UpdateCategoryHandler : IRequestHandler<UpdateCategory, CategoryDTO>
     {
-        private ICategoryRepository _categoryRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private IMapper _mapper;
 
-        public UpdateCategoryHandler(ICategoryRepository categoryRepository, IMapper mapper)
+        public UpdateCategoryHandler(IUnitOfWork unitOfWork, IMapper mapper)
         {
-            _categoryRepository = categoryRepository;
+            _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
 
         public async Task<CategoryDTO> Handle(UpdateCategory request, CancellationToken cancellationToken)
         {
-            var validator = new UpdateCategoryDTOValidator(_categoryRepository);
+            var validator = new UpdateCategoryDTOValidator(_unitOfWork.CategoryRepository);
             var validationResult = await validator.ValidateAsync(request.updateData);
 
             if (!validationResult.IsValid)
@@ -34,7 +34,7 @@ namespace IDonEnglist.Application.Features.Categories.Commands
                 throw new ValidatorException(validationResult);
             }
 
-            var categoryOriginal = await _categoryRepository.Get(request.updateData.Id);
+            var categoryOriginal = await _unitOfWork.CategoryRepository.GetByIdAsync(request.updateData.Id);
 
             if (categoryOriginal == null)
             {
@@ -43,7 +43,8 @@ namespace IDonEnglist.Application.Features.Categories.Commands
 
             _mapper.Map(request.updateData, categoryOriginal);
 
-            var category = await _categoryRepository.Update(_mapper.Map<Category>(categoryOriginal));
+            var category = await _unitOfWork.CategoryRepository.UpdateAsync(_mapper.Map<Category>(categoryOriginal));
+            await _unitOfWork.Save();
 
             return _mapper.Map<CategoryDTO>(category);
         }

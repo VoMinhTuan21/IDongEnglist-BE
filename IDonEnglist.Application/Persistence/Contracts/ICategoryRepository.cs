@@ -4,6 +4,6 @@ namespace IDonEnglist.Application.Persistence.Contracts
 {
     public interface ICategoryRepository : IGenericRepository<Category>
     {
-        Task<IReadOnlyList<Category>> GetAll(bool isHierarchy = false);
+        Task<IReadOnlyList<Category>> GetAllAsync(bool isHierarchy = false);
     }
 }

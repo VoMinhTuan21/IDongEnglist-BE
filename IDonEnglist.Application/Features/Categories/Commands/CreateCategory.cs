@@ -15,18 +15,18 @@ namespace IDonEnglist.Application.Features.Categories.Commands
 
     public class CreateCategoryHandler : IRequestHandler<CreateCategory, CategoryDTO>
     {
-        private readonly ICategoryRepository _categoryRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
-        public CreateCategoryHandler(ICategoryRepository categoryRepository, IMapper mapper)
+        public CreateCategoryHandler(IUnitOfWork unitOfWork, IMapper mapper)
         {
-            _categoryRepository = categoryRepository;
+            _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
         public async Task<CategoryDTO> Handle(CreateCategory request, CancellationToken cancellationToken)
         {
 
-            var validator = new CreateCategoryDTOValidator(_categoryRepository);
+            var validator = new CreateCategoryDTOValidator(_unitOfWork.CategoryRepository);
             var validationResult = await validator.ValidateAsync(request.createData);
 
             if (!validationResult.IsValid)
@@ -34,7 +34,8 @@ namespace IDonEnglist.Application.Features.Categories.Commands
                 throw new ValidatorException(validationResult);
             }
 
-            var category = await _categoryRepository.Add(_mapper.Map<Category>(request.createData));
+            var category = await _unitOfWork.CategoryRepository.AddAsync(_mapper.Map<Category>(request.createData));
+            await _unitOfWork.Save();
 
             return _mapper.Map<CategoryDTO>(category);
         }

@@ -24,6 +24,8 @@ using IDonEnglist.Application.DTOs.TestType;
 using IDonEnglist.Application.DTOs.User;
 using IDonEnglist.Application.DTOs.UserAnswer;
 using IDonEnglist.Application.DTOs.UserSocialAccount;
+using IDonEnglist.Application.ViewModels.Role;
+using IDonEnglist.Application.ViewModels.User;
 using IDonEnglist.Domain;
 
 namespace IDonEnglist.Application.Profiles
@@ -51,7 +53,13 @@ namespace IDonEnglist.Application.Profiles
             CreateMap<Question, QuestionDTO>().ReverseMap();
             CreateMap<QuestionGroup, QuestionGroupDTO>().ReverseMap();
             CreateMap<QuestionGroupMedia, QuestionGroupMediaDTO>().ReverseMap();
+
+            #region role
             CreateMap<Role, RoleDTO>().ReverseMap();
+            CreateMap<CreateRoleDTO, Role>();
+            CreateMap<Role, RoleViewModel>();
+            #endregion
+
             CreateMap<RolePermission, RolePermissionDTO>().ReverseMap();
             CreateMap<Test, TestDTO>().ReverseMap();
             CreateMap<TestPart, TestPartDTO>().ReverseMap();
@@ -61,7 +69,15 @@ namespace IDonEnglist.Application.Profiles
             CreateMap<TestTakenHistory, TestTakenHistoryDTO>().ReverseMap();
             CreateMap<TestType, TestTypeDTO>().ReverseMap();
             CreateMap<UserAnswer, UserAnswerDTO>().ReverseMap();
+
+            #region user
             CreateMap<User, UserDTO>().ReverseMap();
+            CreateMap<SignUpUserDTO, CheckUserExistDTO>();
+            CreateMap<SignUpUserDTO, User>().ForMember(dest => dest.Password, opt => opt.Ignore());
+            CreateMap<User, LoginUserViewModel>();
+            CreateMap<User, RegisterUserViewModel>();
+            #endregion
+
             CreateMap<UserSocialAccount, UserSocialAccountDTO>().ReverseMap();
         }
     }

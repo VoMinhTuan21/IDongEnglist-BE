@@ -17,7 +17,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDonEnglist.Infrastructure"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDonEnglist.Persistence", "IDonEnglist.Persistence\IDonEnglist.Persistence.csproj", "{C92FC3BB-6CE8-472C-BE15-A9A381FF1AA4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IDonEnglist.API", "IDontEnglist.API\IDonEnglist.API.csproj", "{F9FEA961-F3F4-406B-9244-6DE6F00B7096}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDonEnglist.API", "IDontEnglist.API\IDonEnglist.API.csproj", "{F9FEA961-F3F4-406B-9244-6DE6F00B7096}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDonEnglist.Identity", "IDonEnglist.Identity\IDonEnglist.Identity.csproj", "{D94858D6-092D-43A3-BEF4-E049E3F25C83}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{F9FEA961-F3F4-406B-9244-6DE6F00B7096}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F9FEA961-F3F4-406B-9244-6DE6F00B7096}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F9FEA961-F3F4-406B-9244-6DE6F00B7096}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D94858D6-092D-43A3-BEF4-E049E3F25C83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D94858D6-092D-43A3-BEF4-E049E3F25C83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D94858D6-092D-43A3-BEF4-E049E3F25C83}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D94858D6-092D-43A3-BEF4-E049E3F25C83}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -55,6 +61,7 @@ Global
 		{BF1A3CF1-3CDB-45F8-8C79-0785FAA24ABF} = {351AB024-9624-4065-866E-83A4D4E1CCF8}
 		{C92FC3BB-6CE8-472C-BE15-A9A381FF1AA4} = {351AB024-9624-4065-866E-83A4D4E1CCF8}
 		{F9FEA961-F3F4-406B-9244-6DE6F00B7096} = {203C5258-94CA-4D01-A114-3E35F2B085AE}
+		{D94858D6-092D-43A3-BEF4-E049E3F25C83} = {351AB024-9624-4065-866E-83A4D4E1CCF8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {94F0880E-8FF6-41BA-8405-0266C6009DB4}

@@ -2,6 +2,7 @@
 using IDonEnglist.Application.Features.Categories.Commands;
 using IDonEnglist.Application.Features.Categories.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -20,6 +21,7 @@ namespace IDonEnglist.API.Controllers
 
         // GET: api/<CategoryController>
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IReadOnlyList<CategoryDTO>>> Get()
         {
             var categories = await _mediator.Send(new GetCategories());

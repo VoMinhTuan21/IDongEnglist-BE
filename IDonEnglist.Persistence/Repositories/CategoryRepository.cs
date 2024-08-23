@@ -13,7 +13,7 @@ namespace IDonEnglist.Persistence.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<IReadOnlyList<Category>> GetAll(bool isHierarchy = false)
+        public async Task<IReadOnlyList<Category>> GetAllAsync(bool isHierarchy = false)
         {
             if (isHierarchy)
             {

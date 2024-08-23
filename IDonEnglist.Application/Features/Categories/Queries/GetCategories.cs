@@ -22,7 +22,7 @@ namespace IDonEnglist.Application.Features.Categories.Queries
         }
         public async Task<IReadOnlyList<CategoryDTO>> Handle(GetCategories request, CancellationToken cancellationToken)
         {
-            var categories = await _categoryRespository.GetAll(request.IsHierarchy);
+            var categories = await _categoryRespository.GetAllAsync(request.IsHierarchy);
 
             return _mapper.Map<IReadOnlyList<CategoryDTO>>(categories);
         }
