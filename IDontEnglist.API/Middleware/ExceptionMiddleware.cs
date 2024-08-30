@@ -39,11 +39,14 @@ namespace IDonEnglist.API.Middleware
                 case NotFoundException notFound:
                     statusCode = HttpStatusCode.NotFound;
                     result = JsonConvert.SerializeObject(new ErrorDetails { ErrorMessage = notFound.Message, ErrorType = "Failure" });
-
                     break;
                 case ValidatorException validatorException:
                     statusCode = HttpStatusCode.BadRequest;
                     result = JsonConvert.SerializeObject(new ErrorDetails { ErrorMessage = string.Join(",", validatorException.Errors), ErrorType = "Failure" });
+                    break;
+                case ForbiddenException forbidden:
+                    statusCode = HttpStatusCode.Forbidden;
+                    result = JsonConvert.SerializeObject(new ErrorDetails { ErrorMessage = forbidden.Message, ErrorType = "Failure" });
                     break;
                 default:
                     break;

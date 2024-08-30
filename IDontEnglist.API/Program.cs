@@ -1,7 +1,9 @@
+using IDonEnglist.API.Authorization;
 using IDonEnglist.API.Middleware;
 using IDonEnglist.Application;
 using IDonEnglist.Identity;
 using IDonEnglist.Persistence;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -46,6 +48,10 @@ builder.Services.AddSwaggerGen(c =>
     });
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "IDonEnglist API Docs", Version = "v1" });
 });
+
+builder.Services.AddAuthorization();
+builder.Services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
+builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
 
 var app = builder.Build();
 

@@ -13,8 +13,6 @@ namespace IDonEnglist.Persistence
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(IDonEnglistDBContext).Assembly);
-
             modelBuilder.Entity<Answer>()
                 .HasOne(a => a.SampleAudio)
                 .WithOne(a => a.Answer)
@@ -78,6 +76,17 @@ namespace IDonEnglist.Persistence
                 .WithMany(a => a.UserAnswers)
                 .HasForeignKey(a => a.TestSectionTakenHistoryId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Permission>()
+                .HasIndex(a => a.Name).IsUnique();
+
+            modelBuilder.Entity<Permission>()
+                .HasOne(a => a.Parent)
+                .WithMany(a => a.Children)
+                .HasForeignKey(a => a.ParentId)
+                .IsRequired(false);
+
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(IDonEnglistDBContext).Assembly);
         }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

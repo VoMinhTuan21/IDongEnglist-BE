@@ -449,12 +449,14 @@ namespace IDonEnglist.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("ParentId")
+                        .HasColumnType("int");
 
                     b.Property<int?>("UpdatedBy")
                         .HasColumnType("int");
@@ -464,7 +466,48 @@ namespace IDonEnglist.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.HasIndex("ParentId");
+
                     b.ToTable("Permissions");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 5,
+                            Code = "category",
+                            Name = "Category"
+                        },
+                        new
+                        {
+                            Id = 1,
+                            Code = "create-category",
+                            Name = "Create Category",
+                            ParentId = 5
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Code = "update-category",
+                            Name = "Update Category",
+                            ParentId = 5
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Code = "delete-category",
+                            Name = "Delete Category",
+                            ParentId = 5
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Code = "read-category",
+                            Name = "Read Category",
+                            ParentId = 5
+                        });
                 });
 
             modelBuilder.Entity("IDonEnglist.Domain.Question", b =>
@@ -1285,6 +1328,15 @@ namespace IDonEnglist.Persistence.Migrations
                     b.Navigation("Collection");
                 });
 
+            modelBuilder.Entity("IDonEnglist.Domain.Permission", b =>
+                {
+                    b.HasOne("IDonEnglist.Domain.Permission", "Parent")
+                        .WithMany("Children")
+                        .HasForeignKey("ParentId");
+
+                    b.Navigation("Parent");
+                });
+
             modelBuilder.Entity("IDonEnglist.Domain.Question", b =>
                 {
                     b.HasOne("IDonEnglist.Domain.QuestionGroup", "Group")
@@ -1571,6 +1623,8 @@ namespace IDonEnglist.Persistence.Migrations
 
             modelBuilder.Entity("IDonEnglist.Domain.Permission", b =>
                 {
+                    b.Navigation("Children");
+
                     b.Navigation("RolePermissions");
                 });
 

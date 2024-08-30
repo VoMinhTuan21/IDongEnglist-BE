@@ -2,13 +2,15 @@
 
 namespace IDonEnglist.Persistence.Repositories
 {
-    public class UnitOfWork : IUnitOfWork
+    public class UnitOfWork : IUnitOfWork, IDisposable
     {
         private readonly IDonEnglistDBContext _dbContext;
 
         private ICategoryRepository _categoryRepository;
         private IUserRepository _userRepository;
         private IRoleRepository _roleRepository;
+        private IPermissionRepository _permissionRepository;
+        private IRolePermissionRepository _rolePermissionRepository;
 
         public UnitOfWork(IDonEnglistDBContext context)
         {
@@ -39,6 +41,24 @@ namespace IDonEnglist.Persistence.Repositories
             {
                 _roleRepository ??= new RoleRepository(_dbContext);
                 return _roleRepository;
+            }
+        }
+
+        public IPermissionRepository PermissionRepository
+        {
+            get
+            {
+                _permissionRepository ??= new PermissionRepository(_dbContext);
+                return _permissionRepository;
+            }
+        }
+
+        public IRolePermissionRepository RolePermissionRepository
+        {
+            get
+            {
+                _rolePermissionRepository ??= new RolePermissionRepository(_dbContext);
+                return _rolePermissionRepository;
             }
         }
 
