@@ -1,6 +1,8 @@
 @IDontEnglist.API_HostAddress = http://localhost:5152
 
-GET {{IDontEnglist.API_HostAddress}}/cateogries/
+
+
+GET {{IDontEnglist.API_HostAddress}}/api/role?keyword=admin&ascending=true&pageNumber=1&pageSize=10
 Accept: application/json
 
 ###

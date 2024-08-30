@@ -24,6 +24,9 @@ using IDonEnglist.Application.DTOs.TestType;
 using IDonEnglist.Application.DTOs.User;
 using IDonEnglist.Application.DTOs.UserAnswer;
 using IDonEnglist.Application.DTOs.UserSocialAccount;
+using IDonEnglist.Application.ViewModels.Permission;
+using IDonEnglist.Application.ViewModels.Role;
+using IDonEnglist.Application.ViewModels.User;
 using IDonEnglist.Domain;
 
 namespace IDonEnglist.Application.Profiles
@@ -47,11 +50,48 @@ namespace IDonEnglist.Application.Profiles
             CreateMap<FinalTest, FinalTestDTO>().ReverseMap();
             CreateMap<Media, MediaDTO>().ReverseMap();
             CreateMap<Passage, PassageDTO>().ReverseMap();
+
+            #region permission
             CreateMap<Permission, PermissionDTO>().ReverseMap();
+            CreateMap<CreatePermissionDTO, Permission>();
+            CreateMap<Permission, PermissionViewModel>()
+                .ForMember(dest => dest.Children, opt => opt.MapFrom(src => src.Children.Select(c => new PermissionViewModel
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    Code = c.Code
+                })))
+                .PreserveReferences();
+            #endregion
+
             CreateMap<Question, QuestionDTO>().ReverseMap();
             CreateMap<QuestionGroup, QuestionGroupDTO>().ReverseMap();
             CreateMap<QuestionGroupMedia, QuestionGroupMediaDTO>().ReverseMap();
+
+            #region role
             CreateMap<Role, RoleDTO>().ReverseMap();
+            CreateMap<CreateRoleDTO, Role>();
+            CreateMap<UpdateRoleDTO, Role>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<Role, RoleViewModel>()
+                .ForMember(dest => dest.Permissions, opt => opt.MapFrom(src => src.RolePermissions
+                    .Where(rp => rp.DeletedDate == null && rp.DeletedBy == null)
+                    .Select(p => new PermissionViewModel
+                    {
+                        Id = p.Permission.Id,
+                        Name = p.Permission.Name,
+                        Code = p.Permission.Code,
+                        Parent = new PermissionViewModel
+                        {
+                            Id = p.Permission.Parent.Id,
+                            Name = p.Permission.Parent.Name,
+                            Code = p.Permission.Parent.Code,
+                        }
+                    })
+                    )
+                );
+            #endregion
+
             CreateMap<RolePermission, RolePermissionDTO>().ReverseMap();
             CreateMap<Test, TestDTO>().ReverseMap();
             CreateMap<TestPart, TestPartDTO>().ReverseMap();
@@ -61,7 +101,15 @@ namespace IDonEnglist.Application.Profiles
             CreateMap<TestTakenHistory, TestTakenHistoryDTO>().ReverseMap();
             CreateMap<TestType, TestTypeDTO>().ReverseMap();
             CreateMap<UserAnswer, UserAnswerDTO>().ReverseMap();
+
+            #region user
             CreateMap<User, UserDTO>().ReverseMap();
+            CreateMap<SignUpUserDTO, CheckUserExistDTO>();
+            CreateMap<SignUpUserDTO, User>().ForMember(dest => dest.Password, opt => opt.Ignore());
+            CreateMap<User, LoginUserViewModel>();
+            CreateMap<User, RegisterUserViewModel>();
+            #endregion
+
             CreateMap<UserSocialAccount, UserSocialAccountDTO>().ReverseMap();
         }
     }

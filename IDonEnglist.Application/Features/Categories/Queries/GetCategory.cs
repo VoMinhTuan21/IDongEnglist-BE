@@ -22,7 +22,7 @@ namespace IDonEnglist.Application.Features.Categories.Queries
         }
         public async Task<CategoryDTO> Handle(GetCategory request, CancellationToken cancellationToken)
         {
-            var category = _categoryRepository.Get(request.Id);
+            var category = _categoryRepository.GetByIdAsync(request.Id);
 
             return _mapper.Map<CategoryDTO>(category);
         }

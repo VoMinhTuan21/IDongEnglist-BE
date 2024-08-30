@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using IDonEnglist.Application.Services;
+using IDonEnglist.Application.Services.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
 namespace IDonEnglist.Application
@@ -9,6 +11,9 @@ namespace IDonEnglist.Application
         {
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IRolePermissionService, RolePermissionService>();
 
             return services;
         }

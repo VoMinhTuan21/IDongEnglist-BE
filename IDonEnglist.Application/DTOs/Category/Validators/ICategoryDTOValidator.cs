@@ -24,7 +24,7 @@ namespace IDonEnglist.Application.DTOs.Category.Validators
                 .GreaterThan(0)
             .MustAsync(async (id, token) =>
             {
-                var category = await _categoryRepository.Exists(id ?? 0);
+                var category = await _categoryRepository.ExistsAsync(id ?? 0);
 
                 if (!category)
                 {
