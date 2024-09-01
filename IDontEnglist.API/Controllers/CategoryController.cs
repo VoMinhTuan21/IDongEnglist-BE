@@ -1,8 +1,7 @@
-﻿using IDonEnglist.API.Attributes;
-using IDonEnglist.Application.Constants;
-using IDonEnglist.Application.DTOs.Category;
+﻿using IDonEnglist.Application.DTOs.Category;
 using IDonEnglist.Application.Features.Categories.Commands;
 using IDonEnglist.Application.Features.Categories.Queries;
+using IDonEnglist.Application.ViewModels.Category;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,7 +23,6 @@ namespace IDonEnglist.API.Controllers
 
         // GET: api/<CategoryController>
         [HttpGet]
-        [HasPermission(PermissionTypes.CreateCategory)]
         public async Task<ActionResult<IReadOnlyList<CategoryDTO>>> Get()
         {
             var categories = await _mediator.Send(new GetCategories());
@@ -34,7 +32,7 @@ namespace IDonEnglist.API.Controllers
 
         // GET api/<CategoryController>/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<CategoryDTO>> Get(int id)
+        public async Task<ActionResult<CategoryDetailViewModel>> Get(int id)
         {
             var category = await _mediator.Send(new GetCategory() { Id = id });
 

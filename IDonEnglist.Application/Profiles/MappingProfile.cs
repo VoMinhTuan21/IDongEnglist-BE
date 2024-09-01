@@ -24,6 +24,8 @@ using IDonEnglist.Application.DTOs.TestType;
 using IDonEnglist.Application.DTOs.User;
 using IDonEnglist.Application.DTOs.UserAnswer;
 using IDonEnglist.Application.DTOs.UserSocialAccount;
+using IDonEnglist.Application.ViewModels.Category;
+using IDonEnglist.Application.ViewModels.CategorySkill;
 using IDonEnglist.Application.ViewModels.Permission;
 using IDonEnglist.Application.ViewModels.Role;
 using IDonEnglist.Application.ViewModels.User;
@@ -42,10 +44,19 @@ namespace IDonEnglist.Application.Profiles
             #region category
             CreateMap<Category, CategoryDTO>().ReverseMap();
             CreateMap<CreateCategoryDTO, Category>();
-            CreateMap<UpdateCategoryDTO, Category>();
+            CreateMap<UpdateCategoryDTO, Category>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<Category, CategoryViewModel>();
+            CreateMap<Category, CategoryDetailViewModel>()
+                .ForMember(dest => dest.Skills, opt => opt.MapFrom(src => src.Skills.Select(sk => sk.Skill)));
             #endregion
 
+            #region category skill
             CreateMap<CategorySkill, CategorySkillDTO>().ReverseMap();
+            CreateMap<CreateCategorySkillDTO, CategorySkill>();
+            CreateMap<CategorySkill, CategorySkillViewModel>();
+            #endregion
+
             CreateMap<Collection, CollectionDTO>().ReverseMap();
             CreateMap<FinalTest, FinalTestDTO>().ReverseMap();
             CreateMap<Media, MediaDTO>().ReverseMap();
@@ -75,7 +86,6 @@ namespace IDonEnglist.Application.Profiles
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<Role, RoleViewModel>()
                 .ForMember(dest => dest.Permissions, opt => opt.MapFrom(src => src.RolePermissions
-                    .Where(rp => rp.DeletedDate == null && rp.DeletedBy == null)
                     .Select(p => new PermissionViewModel
                     {
                         Id = p.Permission.Id,

@@ -86,6 +86,13 @@ namespace IDonEnglist.Persistence
                 .HasForeignKey(a => a.ParentId)
                 .IsRequired(false);
 
+            modelBuilder.Entity<TestType>()
+                .HasOne(a => a.CategorySkill)
+                .WithOne(a => a.TestType)
+                .HasForeignKey<TestType>(a => a.CategorySkillId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(IDonEnglistDBContext).Assembly);
         }
 

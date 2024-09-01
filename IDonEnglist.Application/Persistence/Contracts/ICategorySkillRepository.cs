@@ -2,7 +2,7 @@
 
 namespace IDonEnglist.Application.Persistence.Contracts
 {
-    public interface ICategoryRepository : IGenericRepository<Category>
+    public interface ICategorySkillRepository : IGenericRepository<CategorySkill>
     {
     }
 }

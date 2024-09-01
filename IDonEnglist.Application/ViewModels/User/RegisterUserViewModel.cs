@@ -1,8 +1,9 @@
-﻿namespace IDonEnglist.Application.ViewModels.User
+﻿using IDonEnglist.Application.ViewModels.Common;
+
+namespace IDonEnglist.Application.ViewModels.User
 {
-    public class RegisterUserViewModel
+    public class RegisterUserViewModel : BaseViewModel
     {
-        public int Id { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }

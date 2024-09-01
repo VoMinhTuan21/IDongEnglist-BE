@@ -26,7 +26,7 @@ namespace IDonEnglist.Application.Features.Roles.Queries
         public async Task<RoleViewModel> Handle(GetRole request, CancellationToken cancellationToken)
         {
             var role = await _unitOfWork.RoleRepository.GetByIdAsync(request.Id,
-                query => query.Include(r => r.RolePermissions)
+                query => query.Include(r => r.RolePermissions.Where(rp => rp.DeletedDate == null && rp.DeletedBy == null))
                     .ThenInclude(rp => rp.Permission)
                     .ThenInclude(p => p.Parent));
 

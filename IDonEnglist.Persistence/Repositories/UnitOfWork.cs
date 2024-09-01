@@ -11,6 +11,7 @@ namespace IDonEnglist.Persistence.Repositories
         private IRoleRepository _roleRepository;
         private IPermissionRepository _permissionRepository;
         private IRolePermissionRepository _rolePermissionRepository;
+        private ICategorySkillRepository _categorySkillRepository;
 
         public UnitOfWork(IDonEnglistDBContext context)
         {
@@ -59,6 +60,15 @@ namespace IDonEnglist.Persistence.Repositories
             {
                 _rolePermissionRepository ??= new RolePermissionRepository(_dbContext);
                 return _rolePermissionRepository;
+            }
+        }
+
+        public ICategorySkillRepository CategorySkillRepository
+        {
+            get
+            {
+                _categorySkillRepository ??= new CategorySkillRepository(_dbContext);
+                return _categorySkillRepository;
             }
         }
 

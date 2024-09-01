@@ -13,8 +13,8 @@ namespace IDonEnglist.Application.DTOs.Category.Validators
             _categoryRepository = categoryRepository;
 
             RuleFor(p => p.Name)
-                .NotEmpty().WithMessage("{PropertyName} is required.")
-                .NotNull().WithMessage("{PropertyName} is required.")
+                .NotEmpty().WithMessage("{PropertyName} is required.").When(dto => !IsUpdate(dto))
+                .NotNull().WithMessage("{PropertyName} is required.").When(dto => !IsUpdate(dto))
                 .MaximumLength(255).WithMessage("{PropertyName} must not exceed 255 characters");
 
             RuleFor(p => p.Code)
@@ -33,6 +33,15 @@ namespace IDonEnglist.Application.DTOs.Category.Validators
 
                 return true;
             }).When(p => p.ParentId.HasValue).WithMessage("{PropertyName} must be a valid category Id");
+        }
+        private bool IsUpdate(ICategoryDTO dto)
+        {
+            if (dto.GetType().GetProperty("Id") != null)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }
