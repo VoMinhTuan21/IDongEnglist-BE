@@ -54,7 +54,7 @@ namespace IDonEnglist.Application.Features.Roles.Commands
             var updatedRole = await _unitOfWork.RoleRepository
                 .GetByIdAsync(
                     request.UpdateData.Id,
-                    query => query.Include(r => r.RolePermissions)
+                    query => query.Include(r => r.RolePermissions.Where(rp => rp.DeletedBy == null && rp.DeletedDate == null))
                         .ThenInclude(rp => rp.Permission)
                         .ThenInclude(p => p.Parent)
                 );

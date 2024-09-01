@@ -5,18 +5,19 @@ using IDonEnglist.Application.Exceptions;
 using IDonEnglist.Application.Models.Identity;
 using IDonEnglist.Application.Persistence.Contracts;
 using IDonEnglist.Application.Utils;
+using IDonEnglist.Application.ViewModels.Category;
 using IDonEnglist.Domain;
 using MediatR;
 
 namespace IDonEnglist.Application.Features.Categories.Commands
 {
-    public class CreateCategory : IRequest<CategoryDTO>
+    public class CreateCategory : IRequest<CategoryViewModel>
     {
         public CreateCategoryDTO CreateData { get; set; }
         public CurrentUser CurrentUser { get; set; }
     }
 
-    public class CreateCategoryHandler : IRequestHandler<CreateCategory, CategoryDTO>
+    public class CreateCategoryHandler : IRequestHandler<CreateCategory, CategoryViewModel>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -26,7 +27,7 @@ namespace IDonEnglist.Application.Features.Categories.Commands
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public async Task<CategoryDTO> Handle(CreateCategory request, CancellationToken cancellationToken)
+        public async Task<CategoryViewModel> Handle(CreateCategory request, CancellationToken cancellationToken)
         {
 
             await ValidateRequest(request);
@@ -38,10 +39,10 @@ namespace IDonEnglist.Application.Features.Categories.Commands
             var temp = _mapper.Map<Category>(request.CreateData);
             temp.CreatedBy = request.CurrentUser.Id;
 
-            var category = await _unitOfWork.CategoryRepository.AddAsync(_mapper.Map<Category>(request.CreateData));
+            var category = await _unitOfWork.CategoryRepository.AddAsync(_mapper.Map<Category>(temp));
             await _unitOfWork.Save();
 
-            return _mapper.Map<CategoryDTO>(category);
+            return _mapper.Map<CategoryViewModel>(category);
         }
         private async Task ValidateRequest(CreateCategory request)
         {

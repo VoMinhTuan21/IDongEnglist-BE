@@ -1,30 +1,33 @@
 ﻿using AutoMapper;
-using IDonEnglist.Application.DTOs.Category;
 using IDonEnglist.Application.Persistence.Contracts;
-using IDonEnglist.Domain;
+using IDonEnglist.Application.ViewModels.Category;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace IDonEnglist.Application.Features.Categories.Queries
 {
-    public class GetCategory : IRequest<CategoryDTO>
+    public class GetCategory : IRequest<CategoryDetailViewModel>
     {
         public int Id { get; set; }
     }
 
-    public class GetCategoryHandler : IRequestHandler<GetCategory, CategoryDTO>
+    public class GetCategoryHandler : IRequestHandler<GetCategory, CategoryDetailViewModel>
     {
-        private readonly IGenericRepository<Category> _categoryRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        public GetCategoryHandler(IGenericRepository<Category> categoryRepository, IMapper mapper)
+        public GetCategoryHandler(IUnitOfWork unitOfWork, IMapper mapper)
         {
-            _categoryRepository = categoryRepository;
+            _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public async Task<CategoryDTO> Handle(GetCategory request, CancellationToken cancellationToken)
+        public async Task<CategoryDetailViewModel> Handle(GetCategory request, CancellationToken cancellationToken)
         {
-            var category = _categoryRepository.GetByIdAsync(request.Id);
+            var category = await _unitOfWork.CategoryRepository
+                .GetOneAsync(c => c.Id == request.Id, false,
+                    query => query.Include(c => c.Skills.Where(sk => sk.DeletedBy == null && sk.DeletedDate == null))
+                );
 
-            return _mapper.Map<CategoryDTO>(category);
+            return _mapper.Map<CategoryDetailViewModel>(category);
         }
     }
 }

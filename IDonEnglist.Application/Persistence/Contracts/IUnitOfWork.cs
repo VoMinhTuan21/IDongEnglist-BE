@@ -7,6 +7,7 @@
         IRoleRepository RoleRepository { get; }
         IPermissionRepository PermissionRepository { get; }
         IRolePermissionRepository RolePermissionRepository { get; }
+        ICategorySkillRepository CategorySkillRepository { get; }
         Task Save();
     }
 }

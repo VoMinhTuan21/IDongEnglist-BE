@@ -1,8 +1,9 @@
-﻿namespace IDonEnglist.Application.ViewModels.Permission
+﻿using IDonEnglist.Application.ViewModels.Common;
+
+namespace IDonEnglist.Application.ViewModels.Permission
 {
-    public class PermissionViewModel
+    public class PermissionViewModel : BaseViewModel
     {
-        public int Id { get; set; }
         public string Name { get; set; }
         public string Code { get; set; }
         public string? Description { get; set; }

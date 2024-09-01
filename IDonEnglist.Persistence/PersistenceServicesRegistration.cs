@@ -22,6 +22,7 @@ namespace IDonEnglist.Persistence
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<IPermissionRepository, PermissionRepository>();
+            services.AddScoped<ICategorySkillRepository, CategorySkillRepository>();
 
             return services;
         }

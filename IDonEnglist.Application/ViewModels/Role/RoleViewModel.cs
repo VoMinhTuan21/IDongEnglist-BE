@@ -1,9 +1,9 @@
-﻿using IDonEnglist.Application.ViewModels.Permission;
-using IDonEnglist.Domain.Common;
+﻿using IDonEnglist.Application.ViewModels.Common;
+using IDonEnglist.Application.ViewModels.Permission;
 
 namespace IDonEnglist.Application.ViewModels.Role
 {
-    public class RoleViewModel : BaseDomainEntity
+    public class RoleViewModel : BaseViewModel
     {
         public string Name { get; set; }
         public string Code { get; set; }

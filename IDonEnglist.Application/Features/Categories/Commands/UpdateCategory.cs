@@ -4,18 +4,19 @@ using IDonEnglist.Application.DTOs.Category.Validators;
 using IDonEnglist.Application.Exceptions;
 using IDonEnglist.Application.Models.Identity;
 using IDonEnglist.Application.Persistence.Contracts;
+using IDonEnglist.Application.ViewModels.Category;
 using IDonEnglist.Domain;
 using MediatR;
 
 namespace IDonEnglist.Application.Features.Categories.Commands
 {
-    public class UpdateCategory : IRequest<CategoryDTO>
+    public class UpdateCategory : IRequest<CategoryViewModel>
     {
         public UpdateCategoryDTO UpdateData { get; set; }
         public CurrentUser CurrentUser { get; set; }
     }
 
-    public class UpdateCategoryHandler : IRequestHandler<UpdateCategory, CategoryDTO>
+    public class UpdateCategoryHandler : IRequestHandler<UpdateCategory, CategoryViewModel>
     {
         private readonly IUnitOfWork _unitOfWork;
         private IMapper _mapper;
@@ -26,7 +27,7 @@ namespace IDonEnglist.Application.Features.Categories.Commands
             _mapper = mapper;
         }
 
-        public async Task<CategoryDTO> Handle(UpdateCategory request, CancellationToken cancellationToken)
+        public async Task<CategoryViewModel> Handle(UpdateCategory request, CancellationToken cancellationToken)
         {
             await ValidateRequest(request);
 
@@ -39,7 +40,7 @@ namespace IDonEnglist.Application.Features.Categories.Commands
             var category = await _unitOfWork.CategoryRepository.UpdateAsync(temp);
             await _unitOfWork.Save();
 
-            return _mapper.Map<CategoryDTO>(category);
+            return _mapper.Map<CategoryViewModel>(category);
         }
 
         private async Task ValidateRequest(UpdateCategory request)
