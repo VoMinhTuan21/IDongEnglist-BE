@@ -64,5 +64,15 @@ namespace IDonEnglist.API.Controllers
 
             return Ok(result);
         }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<int>> Delete([FromRoute] int id)
+        {
+            var command = new DeleteTestType { CurrentUser = GetUserFromToken(), TestTypeId = id };
+
+            await _mediator.Send(command);
+
+            return Ok(id);
+        }
     }
 }
