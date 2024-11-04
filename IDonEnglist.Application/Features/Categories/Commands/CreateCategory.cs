@@ -2,6 +2,7 @@
 using IDonEnglist.Application.DTOs.Category;
 using IDonEnglist.Application.DTOs.Category.Validators;
 using IDonEnglist.Application.Exceptions;
+using IDonEnglist.Application.Features.Categories.Events;
 using IDonEnglist.Application.Models.Identity;
 using IDonEnglist.Application.Persistence.Contracts;
 using IDonEnglist.Application.Utils;
@@ -21,28 +22,60 @@ namespace IDonEnglist.Application.Features.Categories.Commands
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IMediator _mediator;
 
-        public CreateCategoryHandler(IUnitOfWork unitOfWork, IMapper mapper)
+        public CreateCategoryHandler(IUnitOfWork unitOfWork, IMapper mapper, IMediator mediator)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _mediator = mediator;
         }
         public async Task<CategoryViewModel> Handle(CreateCategory request, CancellationToken cancellationToken)
         {
+            // Start a new transaction
+            await _unitOfWork.BeginTransactionAsync();
 
-            await ValidateRequest(request);
+            try
+            {
+                // Validate the request
+                await ValidateRequest(request);
 
-            SetDefaultCodeIfEmpty(request);
+                // Set default code if not provided
+                SetDefaultCodeIfEmpty(request);
 
-            await CheckForDuplicateNameOrCode(request);
+                // Check for duplicate name or code
+                await CheckForDuplicateNameOrCode(request);
 
-            var temp = _mapper.Map<Category>(request.CreateData);
-            temp.CreatedBy = request.CurrentUser.Id;
+                // Create the category entity and map it
+                var categoryEntity = _mapper.Map<Category>(request.CreateData);
 
-            var category = await _unitOfWork.CategoryRepository.AddAsync(_mapper.Map<Category>(temp));
-            await _unitOfWork.Save();
+                // Add the category to the repository
+                var category = await _unitOfWork.CategoryRepository.AddAsync(categoryEntity, request.CurrentUser);
+                await _unitOfWork.Save();
 
-            return _mapper.Map<CategoryViewModel>(category);
+                // If there are associated skills, handle them via the MediatR event
+                if (request.CreateData.Skills != null && request.CreateData.Skills.Count > 0)
+                {
+                    await _mediator.Publish(new CategoryCreatedNotification
+                    {
+                        CategoryId = category.Id,
+                        CurrentUser = request.CurrentUser,
+                        Skills = request.CreateData.Skills
+                    }, cancellationToken);
+                }
+
+                // Commit the transaction if everything was successful
+                await _unitOfWork.CommitTransactionAsync();
+
+                // Return the result mapped to the CategoryViewModel
+                return _mapper.Map<CategoryViewModel>(category);
+            }
+            catch (Exception)
+            {
+                // Rollback transaction if anything goes wrong
+                await _unitOfWork.RollbackTransactionAsync();
+                throw;
+            }
         }
         private async Task ValidateRequest(CreateCategory request)
         {

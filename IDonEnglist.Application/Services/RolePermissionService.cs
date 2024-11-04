@@ -1,4 +1,5 @@
-﻿using IDonEnglist.Application.Persistence.Contracts;
+﻿using IDonEnglist.Application.Models.Identity;
+using IDonEnglist.Application.Persistence.Contracts;
 using IDonEnglist.Application.Services.Interfaces;
 using IDonEnglist.Domain;
 
@@ -13,32 +14,32 @@ namespace IDonEnglist.Application.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task DeleteRolePermissionAsync(int roleId, List<int> permissionIds, int currentUserId)
+        public async Task DeleteRolePermissionAsync(int roleId, List<int> permissionIds, CurrentUser currentUser)
         {
             var deleteRolePermissions = await _unitOfWork.RolePermissionRepository
                 .GetAllListAsync(rp => rp.RoleId == roleId && permissionIds.Contains(rp.Id));
 
             foreach (var rolePermission in deleteRolePermissions)
             {
-                await _unitOfWork.RolePermissionRepository.DeleteAsync(rolePermission.Id, currentUserId);
+                await _unitOfWork.RolePermissionRepository.DeleteAsync(rolePermission.Id, currentUser);
             }
 
             await _unitOfWork.Save();
         }
 
-        public async Task DeleteRolePermissionAsync(int roleId, int currentUserId)
+        public async Task DeleteRolePermissionAsync(int roleId, CurrentUser currentUser)
         {
             var deletedRolePermissions = await _unitOfWork.RolePermissionRepository.GetAllListAsync(rp => rp.RoleId == roleId);
 
             foreach (var rolePermission in deletedRolePermissions)
             {
-                await _unitOfWork.RolePermissionRepository.DeleteAsync(rolePermission.Id, currentUserId);
+                await _unitOfWork.RolePermissionRepository.DeleteAsync(rolePermission.Id, currentUser);
             }
 
             await _unitOfWork.Save();
         }
 
-        public async Task UpdateRolePermissionsAsync(int roleId, List<int> permissionIds, int currentUserId)
+        public async Task UpdateRolePermissionsAsync(int roleId, List<int> permissionIds, CurrentUser currentUser)
         {
             if (permissionIds == null || permissionIds.Count == 0) { return; }
 
@@ -59,21 +60,21 @@ namespace IDonEnglist.Application.Services
                     {
                         existingRolePermission.DeletedDate = null;
                         existingRolePermission.DeletedBy = null;
-                        await _unitOfWork.RolePermissionRepository.UpdateAsync(existingRolePermission);
+                        await _unitOfWork.RolePermissionRepository.UpdateAsync(existingRolePermission, currentUser);
                     }
                 }
                 else
                 {
-                    addedRolePermissions.Add(new RolePermission { PermissionId = permissionId, RoleId = roleId, CreatedBy = currentUserId });
+                    addedRolePermissions.Add(new RolePermission { PermissionId = permissionId, RoleId = roleId, CreatedBy = currentUser.Id });
                 }
             }
 
             if (addedRolePermissions.Any())
             {
-                await _unitOfWork.RolePermissionRepository.AddRangeAsync(addedRolePermissions);
+                await _unitOfWork.RolePermissionRepository.AddRangeAsync(addedRolePermissions, currentUser);
             }
 
-            await DeleteRolePermissionAsync(roleId, deletedRolePermission.Select(a => a.Id).ToList(), currentUserId);
+            await DeleteRolePermissionAsync(roleId, deletedRolePermission.Select(a => a.Id).ToList(), currentUser);
 
             await _unitOfWork.Save();
         }

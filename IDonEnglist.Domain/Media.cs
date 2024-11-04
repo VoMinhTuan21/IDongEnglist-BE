@@ -6,6 +6,7 @@ namespace IDonEnglist.Domain
     {
         public MediaType Type { get; set; }
         public string Url { get; set; }
+        public string PublicId { get; set; }
         public MediaContextType ContextType { get; set; }
         public string? Transcript { get; set; }
 

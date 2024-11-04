@@ -88,8 +88,8 @@ namespace IDonEnglist.Persistence
 
             modelBuilder.Entity<TestType>()
                 .HasOne(a => a.CategorySkill)
-                .WithOne(a => a.TestType)
-                .HasForeignKey<TestType>(a => a.CategorySkillId)
+                .WithMany(a => a.TestTypes)
+                .HasForeignKey(a => a.CategorySkillId)
                 .OnDelete(DeleteBehavior.Restrict);
 
 

@@ -8,6 +8,14 @@
         IPermissionRepository PermissionRepository { get; }
         IRolePermissionRepository RolePermissionRepository { get; }
         ICategorySkillRepository CategorySkillRepository { get; }
+        ICollectionRepository CollectionRepository { get; }
+        IMediaRepository MediaRepository { get; }
+        IRefreshTokenRepository RefreshTokenRepository { get; }
+        ITestTypeRepository TestTypeRepository { get; }
+        ITestPartRepository TestPartRepository { get; }
         Task Save();
+        Task CommitTransactionAsync();
+        Task RollbackTransactionAsync();
+        Task BeginTransactionAsync();
     }
 }

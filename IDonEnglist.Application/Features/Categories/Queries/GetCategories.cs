@@ -6,12 +6,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IDonEnglist.Application.Features.Categories.Queries
 {
-    public class GetCategories : IRequest<IReadOnlyList<CategoryViewModel>>
+    public class GetCategories : IRequest<IReadOnlyList<CategoryDetailViewModel>>
     {
         public bool IsHierarchy { get; set; } = false;
     }
 
-    public class GetCategoriesHandler : IRequestHandler<GetCategories, IReadOnlyList<CategoryViewModel>>
+    public class GetCategoriesHandler : IRequestHandler<GetCategories, IReadOnlyList<CategoryDetailViewModel>>
     {
         private readonly ICategoryRepository _categoryRespository;
         private readonly IMapper _mapper;
@@ -21,12 +21,14 @@ namespace IDonEnglist.Application.Features.Categories.Queries
             _categoryRespository = categoryRepository;
             _mapper = mapper;
         }
-        public async Task<IReadOnlyList<CategoryViewModel>> Handle(GetCategories request, CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<CategoryDetailViewModel>> Handle(GetCategories request, CancellationToken cancellationToken)
         {
             var categories = await _categoryRespository.GetAllListAsync(c => c.ParentId == null, null, true,
-                false, query => query.Include(c => c.Children));
+                false, query => query.Include(c => c.Children)
+                                        .ThenInclude(c => c.Skills.Where(c => c.DeletedDate == null && c.DeletedBy == null))
+            );
 
-            return _mapper.Map<IReadOnlyList<CategoryViewModel>>(categories);
+            return _mapper.Map<IReadOnlyList<CategoryDetailViewModel>>(categories);
         }
     }
 }

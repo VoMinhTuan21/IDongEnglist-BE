@@ -1,4 +1,5 @@
-﻿using IDonEnglist.Application.Models.Pagination;
+﻿using IDonEnglist.Application.Models.Identity;
+using IDonEnglist.Application.Models.Pagination;
 using System.Linq.Expressions;
 
 namespace IDonEnglist.Application.Persistence.Contracts
@@ -19,10 +20,11 @@ namespace IDonEnglist.Application.Persistence.Contracts
             Expression<Func<T, bool>> filter = null, Expression<Func<T, object>> sortBy = null,
             bool ascending = true, bool withDeleted = false,
             Func<IQueryable<T>, IQueryable<T>> include = null);
-        Task<T> AddAsync(T entity);
-        Task<T> UpdateAsync(T entity);
-        Task<T?> DeleteAsync(int id, int currentUserId);
+        Task<T> AddAsync(T entity, CurrentUser? currentUser = null);
+        Task<T> UpdateAsync(T entity, CurrentUser currentUser);
+        Task<T?> DeleteAsync(int id, CurrentUser currentUser);
         Task<bool> ExistsAsync(int id);
-        Task AddRangeAsync(IEnumerable<T> entities);
+        Task AddRangeAsync(IEnumerable<T> entities, CurrentUser currentUser);
+        Task UpdateRangeAsync(IEnumerable<T> entities, CurrentUser currentUser);
     }
 }

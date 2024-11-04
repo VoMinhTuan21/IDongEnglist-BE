@@ -1,4 +1,6 @@
-﻿using IDonEnglist.Application.DTOs.Category;
+﻿using IDonEnglist.API.Attributes;
+using IDonEnglist.Application.Constants;
+using IDonEnglist.Application.DTOs.Category;
 using IDonEnglist.Application.Features.Categories.Commands;
 using IDonEnglist.Application.Features.Categories.Queries;
 using IDonEnglist.Application.ViewModels.Category;
@@ -23,7 +25,7 @@ namespace IDonEnglist.API.Controllers
 
         // GET: api/<CategoryController>
         [HttpGet]
-        public async Task<ActionResult<IReadOnlyList<CategoryDTO>>> Get()
+        public async Task<ActionResult<IReadOnlyList<CategoryViewModel>>> Get()
         {
             var categories = await _mediator.Send(new GetCategories());
 
@@ -32,6 +34,7 @@ namespace IDonEnglist.API.Controllers
 
         // GET api/<CategoryController>/5
         [HttpGet("{id}")]
+        [HasPermission(PermissionTypes.ReadCategory)]
         public async Task<ActionResult<CategoryDetailViewModel>> Get(int id)
         {
             var category = await _mediator.Send(new GetCategory() { Id = id });
@@ -41,7 +44,8 @@ namespace IDonEnglist.API.Controllers
 
         // POST api/<CategoryController>
         [HttpPost]
-        public async Task<ActionResult<CategoryDTO>> Post([FromBody] CreateCategoryDTO dto)
+        [HasPermission(PermissionTypes.CreateCategory)]
+        public async Task<ActionResult<CategoryViewModel>> Post([FromBody] CreateCategoryDTO dto)
         {
             var currentUser = GetUserFromToken();
 
@@ -51,9 +55,10 @@ namespace IDonEnglist.API.Controllers
             return Ok(response);
         }
 
-        // PUT api/<CategoryController>/5
-        [HttpPut("{id}")]
-        public async Task<ActionResult<CategoryDTO>> Put(int id, [FromBody] UpdateCategoryDTO dto)
+        // PUT api/<CategoryController>
+        [HttpPut]
+        [HasPermission(PermissionTypes.UpdateCategory)]
+        public async Task<ActionResult<CategoryViewModel>> Put([FromBody] UpdateCategoryDTO dto)
         {
             var currentUser = GetUserFromToken();
 
@@ -65,7 +70,8 @@ namespace IDonEnglist.API.Controllers
 
         // DELETE api/<CategoryController>/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<CategoryDTO>> Delete(int id)
+        [HasPermission(PermissionTypes.DeleteCategory)]
+        public async Task<ActionResult<CategoryViewModel>> Delete(int id)
         {
             var currentUser = GetUserFromToken();
 

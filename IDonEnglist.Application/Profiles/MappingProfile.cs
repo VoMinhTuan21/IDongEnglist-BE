@@ -26,8 +26,11 @@ using IDonEnglist.Application.DTOs.UserAnswer;
 using IDonEnglist.Application.DTOs.UserSocialAccount;
 using IDonEnglist.Application.ViewModels.Category;
 using IDonEnglist.Application.ViewModels.CategorySkill;
+using IDonEnglist.Application.ViewModels.Collection;
 using IDonEnglist.Application.ViewModels.Permission;
 using IDonEnglist.Application.ViewModels.Role;
+using IDonEnglist.Application.ViewModels.TestPart;
+using IDonEnglist.Application.ViewModels.TestType;
 using IDonEnglist.Application.ViewModels.User;
 using IDonEnglist.Domain;
 
@@ -43,21 +46,47 @@ namespace IDonEnglist.Application.Profiles
 
             #region category
             CreateMap<Category, CategoryDTO>().ReverseMap();
-            CreateMap<CreateCategoryDTO, Category>();
+            CreateMap<CreateCategoryDTO, Category>()
+                .ForMember(s => s.Skills, opt => opt.Ignore());
             CreateMap<UpdateCategoryDTO, Category>()
+                .ForMember(s => s.Skills, opt => opt.Ignore())
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
-            CreateMap<Category, CategoryViewModel>();
+            CreateMap<Category, CategoryViewModel>()
+                .ForAllMembers(opts =>
+                {
+                    opts.AllowNull();
+                    opts.Condition((src, dest, srcMember) => srcMember != null);
+                });
+
             CreateMap<Category, CategoryDetailViewModel>()
-                .ForMember(dest => dest.Skills, opt => opt.MapFrom(src => src.Skills.Select(sk => sk.Skill)));
+                .ForMember(dest => dest.Skills, opt => opt.MapFrom(src => src.Skills.Select(sk => sk.Skill)))
+                .ForMember(dest => dest.Children, opt => opt.MapFrom(src => src.Children))
+                .ForAllMembers(opts =>
+                {
+                    opts.AllowNull();
+                    opts.Condition((src, dest, srcMember) => srcMember != null);
+                });
+            CreateMap<Category, CategoryMiniViewModel>();
             #endregion
 
             #region category skill
             CreateMap<CategorySkill, CategorySkillDTO>().ReverseMap();
             CreateMap<CreateCategorySkillDTO, CategorySkill>();
             CreateMap<CategorySkill, CategorySkillViewModel>();
+            CreateMap<CategorySkill, CategorySkillMiniViewModel>();
+            CreateMap<CategorySkill, CategorySkillWithParentViewModel>();
             #endregion
 
+            #region collection
             CreateMap<Collection, CollectionDTO>().ReverseMap();
+            CreateMap<CreateCollectionDTO, Collection>()
+                .ForMember(s => s.Thumbnail, opt => opt.Ignore());
+            CreateMap<UpdateCollectionDTO, Collection>()
+                .ForMember(s => s.Thumbnail, opt => opt.Ignore())
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<Collection, CollectionViewModel>()
+                .ForMember(dest => dest.Thumbnail, opt => opt.MapFrom(src => src.Thumbnail.Url));
+            #endregion
             CreateMap<FinalTest, FinalTestDTO>().ReverseMap();
             CreateMap<Media, MediaDTO>().ReverseMap();
             CreateMap<Passage, PassageDTO>().ReverseMap();
@@ -104,12 +133,40 @@ namespace IDonEnglist.Application.Profiles
 
             CreateMap<RolePermission, RolePermissionDTO>().ReverseMap();
             CreateMap<Test, TestDTO>().ReverseMap();
+
+            #region test part
             CreateMap<TestPart, TestPartDTO>().ReverseMap();
+            CreateMap<CreateTestPartDTO, TestPart>()
+                .ForMember(dest => dest.NumberOfQuestions, opt => opt.MapFrom(src => src.Questions));
+            CreateMap<TestPart, TestPartViewModel>()
+                .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.NumberOfQuestions));
+            CreateMap<UpdateTestPartDTO, TestPart>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.NumberOfQuestions, opt => opt.MapFrom(src => src.Questions));
+            CreateMap<UpdateTestPartDTO, CreateTestPartDTO>();
+            #endregion
+
             CreateMap<TestPartTakenHistory, TestPartTakenHistoryDTO>().ReverseMap();
             CreateMap<TestSection, TestSectionDTO>().ReverseMap();
             CreateMap<TestSectionTakenHistory, TestSectionTakenHistoryDTO>().ReverseMap();
             CreateMap<TestTakenHistory, TestTakenHistoryDTO>().ReverseMap();
+
+            #region test type
             CreateMap<TestType, TestTypeDTO>().ReverseMap();
+            CreateMap<CreateTestTypeDTO, TestType>()
+                .ForMember(dest => dest.NumberOfParts, opt => opt.MapFrom(src => src.Parts.Count))
+                .ForMember(dest => dest.NumberOfQuestions, opt => opt.MapFrom(src => src.Questions));
+            CreateMap<TestType, TestTypeItemListViewModel>()
+                .ForMember(dest => dest.Parts, opt => opt.MapFrom(src => src.NumberOfParts))
+                .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.NumberOfQuestions));
+            CreateMap<TestType, TestTypeDetailViewModel>()
+                .ForMember(dest => dest.Parts, opt => opt.MapFrom(src => src.TestParts))
+                .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.NumberOfQuestions));
+            CreateMap<UpdateTestTypeDTO, TestType>()
+                .ForMember(dest => dest.NumberOfParts, opt => opt.MapFrom(src => src.Parts.Count))
+                .ForMember(dest => dest.NumberOfQuestions, opt => opt.MapFrom(src => src.Questions));
+            #endregion
+
             CreateMap<UserAnswer, UserAnswerDTO>().ReverseMap();
 
             #region user

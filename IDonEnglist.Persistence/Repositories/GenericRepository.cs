@@ -1,4 +1,5 @@
-﻿using IDonEnglist.Application.Models.Pagination;
+﻿using IDonEnglist.Application.Models.Identity;
+using IDonEnglist.Application.Models.Pagination;
 using IDonEnglist.Application.Persistence.Contracts;
 using IDonEnglist.Domain.Common;
 using Microsoft.EntityFrameworkCore;
@@ -14,20 +15,26 @@ namespace IDonEnglist.Persistence.Repositories
         {
             _dbContext = dBContext;
         }
-        public async Task<T> AddAsync(T entity)
+        public async Task<T> AddAsync(T entity, CurrentUser? currentUser = null)
         {
+            if (currentUser is not null)
+            {
+                entity.CreatedBy = currentUser.Id;
+            }
+            entity.CreatedDate = DateTime.UtcNow;
+
             await _dbContext.AddAsync(entity);
 
             return entity;
         }
 
-        public async Task<T?> DeleteAsync(int id, int currentUserId)
+        public async Task<T?> DeleteAsync(int id, CurrentUser currentUser)
         {
             var entity = await _dbContext.Set<T>().FindAsync(id);
             if (entity != null)
             {
-                entity.DeletedBy = currentUserId;
-                entity.DeletedDate = DateTime.Now;
+                entity.DeletedBy = currentUser.Id;
+                entity.DeletedDate = DateTime.UtcNow;
                 _dbContext.Entry(entity).State = EntityState.Modified;
                 return entity;
             }
@@ -89,8 +96,11 @@ namespace IDonEnglist.Persistence.Repositories
             return new PaginatedList<T>(items, pageNumber, pageSize, totalRecords);
         }
 
-        public async Task<T> UpdateAsync(T entity)
+        public async Task<T> UpdateAsync(T entity, CurrentUser currentUser)
         {
+            entity.UpdatedDate = DateTime.UtcNow;
+            entity.UpdatedBy = currentUser.Id;
+
             _dbContext.Entry(entity).State = EntityState.Modified;
 
             return entity;
@@ -114,8 +124,14 @@ namespace IDonEnglist.Persistence.Repositories
             return await query.FirstOrDefaultAsync(filter);
         }
 
-        public async Task AddRangeAsync(IEnumerable<T> entities)
+        public async Task AddRangeAsync(IEnumerable<T> entities, CurrentUser currentUser)
         {
+            foreach (var entity in entities)
+            {
+                entity.CreatedBy = currentUser.Id;
+                entity.CreatedDate = DateTime.UtcNow;
+            }
+
             await _dbContext.AddRangeAsync(entities);
         }
 
@@ -146,6 +162,18 @@ namespace IDonEnglist.Persistence.Repositories
             }
 
             return await query.ToListAsync();
+        }
+
+        public Task UpdateRangeAsync(IEnumerable<T> entities, CurrentUser currentUser)
+        {
+            foreach (var entity in entities)
+            {
+                entity.UpdatedDate = DateTime.UtcNow;
+                entity.UpdatedBy = currentUser.Id;
+            }
+            _dbContext.Set<T>().UpdateRange(entities);
+
+            return Task.CompletedTask;
         }
     }
 }

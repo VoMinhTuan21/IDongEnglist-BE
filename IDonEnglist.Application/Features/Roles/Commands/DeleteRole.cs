@@ -32,8 +32,8 @@ namespace IDonEnglist.Application.Features.Roles.Commands
             var role = await _unitOfWork.RoleRepository.GetByIdAsync(request.Id)
                 ?? throw new NotFoundException(nameof(Role), request.Id);
 
-            var deletedRole = await _unitOfWork.RoleRepository.DeleteAsync(request.Id, request.CurrentUser.Id);
-            await _rolePermissionService.DeleteRolePermissionAsync(request.Id, request.CurrentUser.Id);
+            var deletedRole = await _unitOfWork.RoleRepository.DeleteAsync(request.Id, request.CurrentUser);
+            await _rolePermissionService.DeleteRolePermissionAsync(request.Id, request.CurrentUser);
             await _unitOfWork.Save();
 
             return _mapper.Map<RoleViewModel>(deletedRole);
