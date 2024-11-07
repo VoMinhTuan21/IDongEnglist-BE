@@ -18,7 +18,7 @@ namespace IDonEnglist.API.Controllers
             _mediator = mediator;
         }
 
-        [HttpPost("/image")]
+        [HttpPost("image")]
         public async Task<ActionResult<ImageUploadResult>> UploadImage(IFormFile file)
         {
             var command = new UploadImage
@@ -34,7 +34,7 @@ namespace IDonEnglist.API.Controllers
             return Ok(uploadResult);
         }
 
-        [HttpPost("/audio")]
+        [HttpPost("audio")]
         public async Task<ActionResult<ImageUploadResult>> UploadAudio(IFormFile file)
         {
             var command = new UploadAudio

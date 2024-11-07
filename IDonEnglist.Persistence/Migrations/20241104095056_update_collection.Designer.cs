@@ -4,6 +4,7 @@ using IDonEnglist.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IDonEnglist.Persistence.Migrations
 {
     [DbContext(typeof(IDonEnglistDBContext))]
-    partial class IDonEnglistDBContextModelSnapshot : ModelSnapshot
+    [Migration("20241104095056_update_collection")]
+    partial class update_collection
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -278,6 +281,7 @@ namespace IDonEnglist.Persistence.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("ThumbnailId")
+                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<int?>("UpdatedBy")
@@ -291,8 +295,7 @@ namespace IDonEnglist.Persistence.Migrations
                     b.HasIndex("CategoryId");
 
                     b.HasIndex("ThumbnailId")
-                        .IsUnique()
-                        .HasFilter("[ThumbnailId] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("Collections");
                 });
@@ -1346,7 +1349,9 @@ namespace IDonEnglist.Persistence.Migrations
 
                     b.HasOne("IDonEnglist.Domain.Media", "Thumbnail")
                         .WithOne("Collection")
-                        .HasForeignKey("IDonEnglist.Domain.Collection", "ThumbnailId");
+                        .HasForeignKey("IDonEnglist.Domain.Collection", "ThumbnailId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Category");
 

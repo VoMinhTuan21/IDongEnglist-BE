@@ -29,7 +29,7 @@ namespace IDonEnglist.Persistence
                 .HasOne(a => a.Thumbnail)
                 .WithOne(a => a.Collection)
                 .HasForeignKey<Collection>(a => a.ThumbnailId)
-                .IsRequired();
+                .IsRequired(false);
 
             modelBuilder.Entity<Test>()
                 .HasOne(a => a.Audio)

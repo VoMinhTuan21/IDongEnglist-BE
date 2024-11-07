@@ -4,6 +4,7 @@ using IDonEnglist.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IDonEnglist.Persistence.Migrations
 {
     [DbContext(typeof(IDonEnglistDBContext))]
-    partial class IDonEnglistDBContextModelSnapshot : ModelSnapshot
+    [Migration("20241104095403_update_collection_next")]
+    partial class update_collection_next
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

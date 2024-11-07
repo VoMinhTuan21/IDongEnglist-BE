@@ -7,6 +7,7 @@ using IDonEnglist.Application.DTOs.CategorySkill;
 using IDonEnglist.Application.DTOs.Collection;
 using IDonEnglist.Application.DTOs.FinalTest;
 using IDonEnglist.Application.DTOs.Media;
+using IDonEnglist.Application.DTOs.Media.Validators;
 using IDonEnglist.Application.DTOs.Passage;
 using IDonEnglist.Application.DTOs.Permission;
 using IDonEnglist.Application.DTOs.Question;
@@ -27,6 +28,7 @@ using IDonEnglist.Application.DTOs.UserSocialAccount;
 using IDonEnglist.Application.ViewModels.Category;
 using IDonEnglist.Application.ViewModels.CategorySkill;
 using IDonEnglist.Application.ViewModels.Collection;
+using IDonEnglist.Application.ViewModels.Media;
 using IDonEnglist.Application.ViewModels.Permission;
 using IDonEnglist.Application.ViewModels.Role;
 using IDonEnglist.Application.ViewModels.TestPart;
@@ -83,12 +85,33 @@ namespace IDonEnglist.Application.Profiles
                 .ForMember(s => s.Thumbnail, opt => opt.Ignore());
             CreateMap<UpdateCollectionDTO, Collection>()
                 .ForMember(s => s.Thumbnail, opt => opt.Ignore())
-                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+                .ForAllMembers(opts =>
+                {
+                    opts.AllowNull();
+                    opts.Condition((src, dest, srcMember) => srcMember != null);
+                });
             CreateMap<Collection, CollectionViewModel>()
                 .ForMember(dest => dest.Thumbnail, opt => opt.MapFrom(src => src.Thumbnail.Url));
             #endregion
+
             CreateMap<FinalTest, FinalTestDTO>().ReverseMap();
+
+            #region media
             CreateMap<Media, MediaDTO>().ReverseMap();
+            CreateMap<CreateMediaDTO, Media>();
+            CreateMap<UpdateMediaDTO, Media>()
+                .ForAllMembers(opts =>
+                {
+                    opts.AllowNull();
+                    opts.Condition((src, dest, srcMember) =>
+                        srcMember != null &&
+                        (!(srcMember is string str) || !string.IsNullOrWhiteSpace(str)) &&
+                        (!(srcMember is Enum) || !srcMember.Equals(Activator.CreateInstance(srcMember.GetType())))
+                    );
+                });
+            CreateMap<Media, MediaViewModel>();
+
+            #endregion
             CreateMap<Passage, PassageDTO>().ReverseMap();
 
             #region permission

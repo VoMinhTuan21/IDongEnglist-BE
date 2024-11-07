@@ -1,5 +1,7 @@
 ﻿using IDonEnglist.Application.DTOs.Collection;
 using IDonEnglist.Application.Features.Collections.Commands;
+using IDonEnglist.Application.Features.Collections.Queries;
+using IDonEnglist.Application.Models.Pagination;
 using IDonEnglist.Application.ViewModels.Collection;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -20,15 +22,12 @@ namespace IDonEnglist.API.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<ActionResult<PaginatedList<CollectionViewModel>>> GetPagination([FromQuery] GetPaginationCollectionsDTO filter)
         {
-            return new string[] { "value1", "value2" };
-        }
+            var query = new GetPaginationCollections { Filter = filter };
+            var result = await _mediator.Send(query);
 
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
+            return Ok(result);
         }
 
         [HttpPost]
@@ -46,14 +45,36 @@ namespace IDonEnglist.API.Controllers
             return Ok(collection);
         }
 
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpPut]
+        public async Task<ActionResult<int>> Update([FromBody] UpdateCollectionDTO updateData)
         {
+            var currentUser = GetUserFromToken();
+
+            var collectionId = await _mediator.Send(
+                new UpdateCollection
+                {
+                    CurrentUser = currentUser,
+                    UpdateDataFromController = updateData
+                }
+            );
+
+            return Ok(collectionId);
         }
 
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<ActionResult<int>> Delete(int id)
         {
+            var currentUser = GetUserFromToken();
+
+            var collectionId = await _mediator.Send(
+                new DeleteCollection
+                {
+                    CurrentUser = currentUser,
+                    DeleteData = new Application.DTOs.Common.BaseDTO { Id = id }
+                }
+            );
+
+            return Ok(collectionId);
         }
     }
 }
