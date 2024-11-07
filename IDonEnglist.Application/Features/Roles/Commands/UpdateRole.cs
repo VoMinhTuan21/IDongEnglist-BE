@@ -37,17 +37,15 @@ namespace IDonEnglist.Application.Features.Roles.Commands
             var oldRole = await _unitOfWork.RoleRepository.GetByIdAsync(request.UpdateData.Id)
                 ?? throw new NotFoundException(nameof(Role), request.UpdateData.Id);
 
-            oldRole.UpdatedBy = request.CurrentUser.Id;
-
             oldRole = _mapper.Map(request.UpdateData, oldRole);
 
             if (request.UpdateData.PermissionIds != null || request.UpdateData.PermissionIds?.Count() != 0)
             {
                 await _rolePermissionService.UpdateRolePermissionsAsync(request.UpdateData.Id,
-                    request.UpdateData.PermissionIds, request.CurrentUser.Id);
+                    request.UpdateData.PermissionIds, request.CurrentUser);
             }
 
-            await _unitOfWork.RoleRepository.UpdateAsync(oldRole);
+            await _unitOfWork.RoleRepository.UpdateAsync(oldRole, request.CurrentUser);
 
             await _unitOfWork.Save();
 

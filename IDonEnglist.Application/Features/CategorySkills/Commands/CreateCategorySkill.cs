@@ -32,9 +32,8 @@ namespace IDonEnglist.Application.Features.CategorySkills.Commands
             await ValidateRequest(request);
 
             var temp = _mapper.Map<CategorySkill>(request.CreateData);
-            temp.CreatedBy = request.CurrentUser.Id;
 
-            var newCategorySkill = await _unitOfWork.CategorySkillRepository.AddAsync(temp);
+            var newCategorySkill = await _unitOfWork.CategorySkillRepository.AddAsync(temp, request.CurrentUser);
             await _unitOfWork.Save();
 
             return _mapper.Map<CategorySkillViewModel>(newCategorySkill);

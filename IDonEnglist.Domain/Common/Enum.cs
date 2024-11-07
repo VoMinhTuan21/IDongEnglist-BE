@@ -24,7 +24,8 @@
     public enum MediaContextType
     {
         Test = 1,
-        Answer = 3
+        Answer = 3,
+        Other = 5
     }
 
     public enum TestTakenStatus

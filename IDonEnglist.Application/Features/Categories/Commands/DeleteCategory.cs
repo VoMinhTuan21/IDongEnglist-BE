@@ -28,7 +28,7 @@ namespace IDonEnglist.Application.Features.Categories.Commands
         {
             var category = await _unitOfWork.CategoryRepository.GetByIdAsync(request.Id)
                 ?? throw new NotFoundException(nameof(Category), request.Id);
-            await _unitOfWork.CategoryRepository.DeleteAsync(request.Id, request.CurrentUser.Id);
+            await _unitOfWork.CategoryRepository.DeleteAsync(request.Id, request.CurrentUser);
             await _unitOfWork.Save();
 
             return _mapper.Map<CategoryViewModel>(category);

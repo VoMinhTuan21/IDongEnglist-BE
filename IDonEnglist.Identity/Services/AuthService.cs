@@ -8,6 +8,7 @@ using IDonEnglist.Application.Persistence.Contracts;
 using IDonEnglist.Application.ViewModels.User;
 using IDonEnglist.Domain;
 using IDonEnglist.Identity.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -153,9 +154,15 @@ namespace IDonEnglist.Identity.Services
             response.Token = new JwtSecurityTokenHandler().WriteToken(token);
             response.RefreshToken = refreshToken;
 
-            user.RefreshToken = refreshToken;
+            var refreshTokenObject = new RefreshToken()
+            {
+                Token = new JwtSecurityTokenHandler().WriteToken(token),
+                TokenRefresh = refreshToken,
+                UserId = user.Id,
+                CreatedBy = user.Id
+            };
 
-            await _unitOfWork.UserRepository.UpdateAsync(user);
+            await _unitOfWork.RefreshTokenRepository.AddAsync(refreshTokenObject);
             await _unitOfWork.Save();
 
             return response;
@@ -165,27 +172,40 @@ namespace IDonEnglist.Identity.Services
         {
             var principal = GetPrincipalFromExpiredToken(refreshData.Token);
             var userIdClaim = principal.FindFirst(CustomClaimTypes.Id)
-                ?? throw new SecurityTokenException("User ID not found in access token.");
+                ?? throw new BadRequestException("User ID not found in access token.");
 
-            var user = await _unitOfWork.UserRepository.GetByIdAsync(int.Parse(userIdClaim.Value ?? "0"));
+            var user = await _unitOfWork.UserRepository.GetByIdAsync(
+                    int.Parse(userIdClaim.Value ?? "0"),
+                    query => query.Include(u => u.RefreshTokens.Where(r =>
+                                    r.TokenRefresh == refreshData.RefreshToken
+                                    && r.DeletedDate == null && r.DeletedBy == null)))
+                ?? throw new NotFoundException(nameof(User), userIdClaim);
 
-            if (user == null || user.RefreshToken != refreshData.RefreshToken)
+            if (user.RefreshTokens.Count == 0)
             {
-                throw new SecurityTokenException("Invalid refresh token.");
+                throw new BadRequestException("Invalid refresh token");
             }
 
             var newAccessToken = GenerateToken(user);
             var newRefreshToken = Guid.NewGuid().ToString();
-
-            user.RefreshToken = newRefreshToken;
-            await _unitOfWork.UserRepository.UpdateAsync(user);
-            await _unitOfWork.Save();
 
             var newToken = new RefreshTokenViewModel
             {
                 Token = new JwtSecurityTokenHandler().WriteToken(newAccessToken),
                 RefreshToken = newRefreshToken
             };
+
+            var refreshTokenObject = new RefreshToken
+            {
+                TokenRefresh = newRefreshToken,
+                Token = new JwtSecurityTokenHandler().WriteToken(newAccessToken),
+                UserId = user.Id,
+                CreatedBy = user.Id
+            };
+
+            await _unitOfWork.RefreshTokenRepository.DeleteAsync(user.RefreshTokens.First().Id, new CurrentUser { Id = user.Id, Name = user.Name });
+            await _unitOfWork.RefreshTokenRepository.AddAsync(refreshTokenObject);
+            await _unitOfWork.Save();
 
             return newToken;
         }

@@ -1,4 +1,5 @@
-﻿using IDonEnglist.Application.ViewModels.Common;
+﻿using IDonEnglist.Application.ViewModels.CategorySkill;
+using IDonEnglist.Application.ViewModels.Common;
 
 namespace IDonEnglist.Application.ViewModels.Category
 {
@@ -8,5 +9,6 @@ namespace IDonEnglist.Application.ViewModels.Category
         public string Code { get; set; }
         public int? ParentId { get; set; }
         public ICollection<CategoryViewModel> Children { get; set; }
+        public List<CategorySkillMiniViewModel>? Skills { get; set; }
     }
 }

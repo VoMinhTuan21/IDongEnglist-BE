@@ -28,7 +28,7 @@ namespace IDonEnglist.Application.Features.CategorySkills.Commands
                 throw new NotFoundException(nameof(CategorySkill), request.Id);
             }
 
-            await _unitOfWork.CategorySkillRepository.DeleteAsync(request.Id, request.CurrentUser.Id);
+            await _unitOfWork.CategorySkillRepository.DeleteAsync(request.Id, request.CurrentUser);
             await _unitOfWork.Save();
 
             return request.Id;

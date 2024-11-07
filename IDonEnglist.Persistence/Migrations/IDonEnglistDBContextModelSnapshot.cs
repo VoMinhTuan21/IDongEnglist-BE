@@ -277,7 +277,7 @@ namespace IDonEnglist.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ThumbnailId")
+                    b.Property<int?>("ThumbnailId")
                         .HasColumnType("int");
 
                     b.Property<int?>("UpdatedBy")
@@ -291,7 +291,8 @@ namespace IDonEnglist.Persistence.Migrations
                     b.HasIndex("CategoryId");
 
                     b.HasIndex("ThumbnailId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[ThumbnailId] IS NOT NULL");
 
                     b.ToTable("Collections");
                 });
@@ -362,6 +363,10 @@ namespace IDonEnglist.Persistence.Migrations
 
                     b.Property<DateTime?>("DeletedDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("PublicId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Transcript")
                         .HasColumnType("nvarchar(max)");
@@ -633,6 +638,50 @@ namespace IDonEnglist.Persistence.Migrations
                     b.HasIndex("QuestionGroupId");
 
                     b.ToTable("QuestionGroupMedias");
+                });
+
+            modelBuilder.Entity("IDonEnglist.Domain.RefreshToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("DeletedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TokenRefresh")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshToken");
                 });
 
             modelBuilder.Entity("IDonEnglist.Domain.Role", b =>
@@ -1071,8 +1120,7 @@ namespace IDonEnglist.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CategorySkillId")
-                        .IsUnique();
+                    b.HasIndex("CategorySkillId");
 
                     b.ToTable("TestTypes");
                 });
@@ -1113,10 +1161,7 @@ namespace IDonEnglist.Persistence.Migrations
                     b.Property<string>("Phone")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("RefreshToken")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("RoleId")
+                    b.Property<int?>("RoleId")
                         .HasColumnType("int");
 
                     b.Property<int?>("UpdatedBy")
@@ -1301,9 +1346,7 @@ namespace IDonEnglist.Persistence.Migrations
 
                     b.HasOne("IDonEnglist.Domain.Media", "Thumbnail")
                         .WithOne("Collection")
-                        .HasForeignKey("IDonEnglist.Domain.Collection", "ThumbnailId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("IDonEnglist.Domain.Collection", "ThumbnailId");
 
                     b.Navigation("Category");
 
@@ -1369,6 +1412,17 @@ namespace IDonEnglist.Persistence.Migrations
                     b.Navigation("Media");
 
                     b.Navigation("QuestionGroup");
+                });
+
+            modelBuilder.Entity("IDonEnglist.Domain.RefreshToken", b =>
+                {
+                    b.HasOne("IDonEnglist.Domain.User", "User")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("IDonEnglist.Domain.RolePermission", b =>
@@ -1507,8 +1561,8 @@ namespace IDonEnglist.Persistence.Migrations
             modelBuilder.Entity("IDonEnglist.Domain.TestType", b =>
                 {
                     b.HasOne("IDonEnglist.Domain.CategorySkill", "CategorySkill")
-                        .WithOne("TestType")
-                        .HasForeignKey("IDonEnglist.Domain.TestType", "CategorySkillId")
+                        .WithMany("TestTypes")
+                        .HasForeignKey("CategorySkillId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -1519,9 +1573,7 @@ namespace IDonEnglist.Persistence.Migrations
                 {
                     b.HasOne("IDonEnglist.Domain.Role", "Role")
                         .WithMany("Users")
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("RoleId");
 
                     b.Navigation("Role");
                 });
@@ -1599,8 +1651,7 @@ namespace IDonEnglist.Persistence.Migrations
 
             modelBuilder.Entity("IDonEnglist.Domain.CategorySkill", b =>
                 {
-                    b.Navigation("TestType")
-                        .IsRequired();
+                    b.Navigation("TestTypes");
                 });
 
             modelBuilder.Entity("IDonEnglist.Domain.Collection", b =>
@@ -1707,6 +1758,8 @@ namespace IDonEnglist.Persistence.Migrations
 
             modelBuilder.Entity("IDonEnglist.Domain.User", b =>
                 {
+                    b.Navigation("RefreshTokens");
+
                     b.Navigation("TestTakenHistories");
 
                     b.Navigation("UserSocialAccounts");

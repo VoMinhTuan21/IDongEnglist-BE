@@ -59,7 +59,10 @@ namespace IDonEnglist.API.Middleware
 
     public class ErrorDetails
     {
+        [JsonProperty("errorType")]
         public string ErrorType { get; set; }
+
+        [JsonProperty("errorMessage")]
         public string ErrorMessage { get; set; }
     }
 }

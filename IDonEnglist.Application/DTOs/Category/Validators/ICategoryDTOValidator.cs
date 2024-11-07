@@ -33,6 +33,8 @@ namespace IDonEnglist.Application.DTOs.Category.Validators
 
                 return true;
             }).When(p => p.ParentId.HasValue).WithMessage("{PropertyName} must be a valid category Id");
+
+            RuleForEach(p => p.Skills).IsInEnum().When(p => p.Skills != null && p.Skills.Count > 0).WithMessage("{PropertyName} is not valid");
         }
         private bool IsUpdate(ICategoryDTO dto)
         {

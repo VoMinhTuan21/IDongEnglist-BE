@@ -23,7 +23,12 @@ namespace IDonEnglist.Application.Services
                 return [];
             }
 
-            return userWithDetails.Role.RolePermissions.Select(u => u.Permission.Name).ToHashSet();
+            if (userWithDetails.Role is not null)
+            {
+                return userWithDetails.Role.RolePermissions.Select(u => u.Permission.Name).ToHashSet();
+            }
+
+            return [];
         }
     }
 }

@@ -11,7 +11,7 @@ namespace IDonEnglist.Identity
 {
     public static class IdentityServicesRegistration
     {
-        public static IServiceCollection ConfigureIdentitySerivces(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection ConfigureIdentityServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<JWTSettings>(configuration.GetSection("JwtSettings"));
 

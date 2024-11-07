@@ -12,13 +12,13 @@ namespace IDonEnglist.Application.DTOs.Pagination.Validators
 
             RuleFor(x => x.SortBy)
                 .Must(BeAValidPropertyName)
-                .WithMessage($"SortBy must be a valid property name of {_targetType.Name}.")
+                .WithMessage($"SortBy must be a valid property name of {_targetType.Name}. Please remind case-sensitive")
                 .When(x => !string.IsNullOrEmpty(x.SortBy));
         }
 
         private bool BeAValidPropertyName(string sortBy)
         {
-            return _targetType.GetProperties().Any(p => p.Name.Equals(sortBy, StringComparison.OrdinalIgnoreCase));
+            return _targetType.GetProperties().Any(p => p.Name.Equals(sortBy, StringComparison.Ordinal));
         }
     }
 }

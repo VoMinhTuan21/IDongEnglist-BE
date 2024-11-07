@@ -2,11 +2,13 @@
 using IDonEnglist.Application.DTOs.Category;
 using IDonEnglist.Application.DTOs.Category.Validators;
 using IDonEnglist.Application.Exceptions;
+using IDonEnglist.Application.Features.Categories.Events;
 using IDonEnglist.Application.Models.Identity;
 using IDonEnglist.Application.Persistence.Contracts;
 using IDonEnglist.Application.ViewModels.Category;
 using IDonEnglist.Domain;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace IDonEnglist.Application.Features.Categories.Commands
 {
@@ -20,27 +22,60 @@ namespace IDonEnglist.Application.Features.Categories.Commands
     {
         private readonly IUnitOfWork _unitOfWork;
         private IMapper _mapper;
+        private readonly IMediator _mediator;
 
-        public UpdateCategoryHandler(IUnitOfWork unitOfWork, IMapper mapper)
+        public UpdateCategoryHandler(IUnitOfWork unitOfWork, IMapper mapper, IMediator mediator)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _mediator = mediator;
         }
 
         public async Task<CategoryViewModel> Handle(UpdateCategory request, CancellationToken cancellationToken)
         {
-            await ValidateRequest(request);
+            await _unitOfWork.BeginTransactionAsync();
+            try
+            {
+                await ValidateRequest(request);
 
-            var categoryOriginal = await _unitOfWork.CategoryRepository.GetByIdAsync(request.UpdateData.Id)
-                ?? throw new NotFoundException(nameof(Category), request.UpdateData.Id);
+                var categoryOriginal = await _unitOfWork.CategoryRepository.GetByIdAsync(request.UpdateData.Id)
+                    ?? throw new NotFoundException(nameof(Category), request.UpdateData.Id);
 
-            var temp = _mapper.Map(request.UpdateData, categoryOriginal);
-            temp.UpdatedBy = request.CurrentUser.Id;
+                var temp = _mapper.Map(request.UpdateData, categoryOriginal);
 
-            var category = await _unitOfWork.CategoryRepository.UpdateAsync(temp);
-            await _unitOfWork.Save();
+                if (request.UpdateData.Name != null)
+                {
+                    temp.Code = Utils.SlugGenerator.GenerateSlug(request.UpdateData.Name);
+                }
 
-            return _mapper.Map<CategoryViewModel>(category);
+                await _unitOfWork.CategoryRepository.UpdateAsync(temp, request.CurrentUser);
+                await _unitOfWork.Save();
+
+                if (request.UpdateData.Skills != null)
+                {
+                    await _mediator.Publish(new CategoryUpdatedNotification
+                    {
+                        Skills = request.UpdateData.Skills,
+                        CategoryId = categoryOriginal.Id,
+                        CurrentUser = request.CurrentUser,
+                    });
+                }
+
+
+                var category = await _unitOfWork.CategoryRepository
+                    .GetOneAsync(c => c.Id == request.UpdateData.Id, false,
+                        query => query.Include(c => c.Skills.Where(sk => sk.DeletedBy == null && sk.DeletedDate == null)).AsNoTracking()
+                    );
+
+                await _unitOfWork.CommitTransactionAsync();
+
+                return _mapper.Map<CategoryViewModel>(category);
+            }
+            catch (Exception)
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                throw;
+            }
         }
 
         private async Task ValidateRequest(UpdateCategory request)

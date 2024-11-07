@@ -29,7 +29,7 @@ namespace IDonEnglist.Persistence
                 .HasOne(a => a.Thumbnail)
                 .WithOne(a => a.Collection)
                 .HasForeignKey<Collection>(a => a.ThumbnailId)
-                .IsRequired();
+                .IsRequired(false);
 
             modelBuilder.Entity<Test>()
                 .HasOne(a => a.Audio)
@@ -88,8 +88,8 @@ namespace IDonEnglist.Persistence
 
             modelBuilder.Entity<TestType>()
                 .HasOne(a => a.CategorySkill)
-                .WithOne(a => a.TestType)
-                .HasForeignKey<TestType>(a => a.CategorySkillId)
+                .WithMany(a => a.TestTypes)
+                .HasForeignKey(a => a.CategorySkillId)
                 .OnDelete(DeleteBehavior.Restrict);
 
 

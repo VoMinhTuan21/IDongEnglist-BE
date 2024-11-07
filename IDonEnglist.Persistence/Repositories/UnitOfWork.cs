@@ -1,10 +1,12 @@
 ﻿using IDonEnglist.Application.Persistence.Contracts;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace IDonEnglist.Persistence.Repositories
 {
     public class UnitOfWork : IUnitOfWork, IDisposable
     {
         private readonly IDonEnglistDBContext _dbContext;
+        private IDbContextTransaction _transaction;
 
         private ICategoryRepository _categoryRepository;
         private IUserRepository _userRepository;
@@ -12,6 +14,11 @@ namespace IDonEnglist.Persistence.Repositories
         private IPermissionRepository _permissionRepository;
         private IRolePermissionRepository _rolePermissionRepository;
         private ICategorySkillRepository _categorySkillRepository;
+        private ICollectionRepository _collectionRepository;
+        private IMediaRepository _mediaRepository;
+        private IRefreshTokenRepository _refreshTokenRepository;
+        private ITestPartRepository _testPartRepository;
+        private ITestTypeRepository _testTypeRepository;
 
         public UnitOfWork(IDonEnglistDBContext context)
         {
@@ -72,6 +79,51 @@ namespace IDonEnglist.Persistence.Repositories
             }
         }
 
+        public ICollectionRepository CollectionRepository
+        {
+            get
+            {
+                _collectionRepository ??= new CollectionRepository(_dbContext);
+                return _collectionRepository;
+            }
+        }
+
+        public IMediaRepository MediaRepository
+        {
+            get
+            {
+                _mediaRepository ??= new MediaRepository(_dbContext);
+                return _mediaRepository;
+            }
+        }
+
+        public IRefreshTokenRepository RefreshTokenRepository
+        {
+            get
+            {
+                _refreshTokenRepository ??= new RefreshTokenRepository(_dbContext);
+                return _refreshTokenRepository;
+            }
+        }
+
+        public ITestTypeRepository TestTypeRepository
+        {
+            get
+            {
+                _testTypeRepository ??= new TestTypeRepository(_dbContext);
+                return _testTypeRepository;
+            }
+        }
+
+        public ITestPartRepository TestPartRepository
+        {
+            get
+            {
+                _testPartRepository ??= new TestPartRepository(_dbContext);
+                return _testPartRepository;
+            }
+        }
+
         public void Dispose()
         {
             _dbContext.Dispose();
@@ -81,6 +133,34 @@ namespace IDonEnglist.Persistence.Repositories
         public async Task Save()
         {
             await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task BeginTransactionAsync()
+        {
+            if (_transaction == null)
+            {
+                _transaction = await _dbContext.Database.BeginTransactionAsync();
+            }
+        }
+
+        public async Task CommitTransactionAsync()
+        {
+            if (_transaction != null)
+            {
+                await _transaction.CommitAsync();
+                await _transaction.DisposeAsync();
+                _transaction = null;
+            }
+        }
+
+        public async Task RollbackTransactionAsync()
+        {
+            if (_transaction != null)
+            {
+                await _transaction.RollbackAsync();
+                await _transaction.DisposeAsync();
+                _transaction = null;
+            }
         }
     }
 }

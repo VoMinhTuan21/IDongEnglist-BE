@@ -2,6 +2,6 @@
 {
     public class CategoryDetailViewModel : CategoryViewModel
     {
-        public List<int> Skills { get; set; }
+        public List<int>? Skills { get; set; }
     }
 }

@@ -8,6 +8,6 @@ namespace IDonEnglist.Domain
         public int CategoryId { get; set; }
         public Category Category { get; set; }
 
-        public TestType TestType { get; set; }
+        public List<TestType> TestTypes { get; set; }
     }
 }

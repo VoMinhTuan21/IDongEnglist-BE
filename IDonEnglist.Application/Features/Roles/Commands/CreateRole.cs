@@ -37,9 +37,8 @@ namespace IDonEnglist.Application.Features.Roles.Commands
             await CheckForDuplicateNameOrCode(request);
 
             var temp = _mapper.Map<Role>(request.CreateData);
-            temp.CreatedBy = request.CurrentUser.Id;
 
-            var role = await _unitOfWork.RoleRepository.AddAsync(temp);
+            var role = await _unitOfWork.RoleRepository.AddAsync(temp, request.CurrentUser);
 
             await _unitOfWork.Save();
 
@@ -112,10 +111,9 @@ namespace IDonEnglist.Application.Features.Roles.Commands
             {
                 RoleId = role.Id,
                 PermissionId = id,
-                CreatedBy = request.CurrentUser.Id
             }).ToList();
 
-            await _unitOfWork.RolePermissionRepository.AddRangeAsync(rolePermissions);
+            await _unitOfWork.RolePermissionRepository.AddRangeAsync(rolePermissions, request.CurrentUser);
         }
     }
 }
