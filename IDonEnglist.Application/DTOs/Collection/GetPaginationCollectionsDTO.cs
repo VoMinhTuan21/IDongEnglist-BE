@@ -6,5 +6,6 @@ namespace IDonEnglist.Application.DTOs.Collection
     {
         public int? CategoryId { get; set; }
         public string? Keywords { get; set; }
+        public bool MinSize { get; set; } = false;
     }
 }

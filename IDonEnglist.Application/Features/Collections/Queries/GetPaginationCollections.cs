@@ -13,12 +13,12 @@ using System.Linq.Expressions;
 
 namespace IDonEnglist.Application.Features.Collections.Queries
 {
-    public class GetPaginationCollections : IRequest<PaginatedList<CollectionViewModel>>
+    public class GetPaginationCollections : IRequest<object>
     {
         public GetPaginationCollectionsDTO Filter { get; set; }
     }
 
-    public class GetPaginationCollectionsHandler : IRequestHandler<GetPaginationCollections, PaginatedList<CollectionViewModel>>
+    public class GetPaginationCollectionsHandler : IRequestHandler<GetPaginationCollections, object>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -28,7 +28,7 @@ namespace IDonEnglist.Application.Features.Collections.Queries
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public async Task<PaginatedList<CollectionViewModel>> Handle(GetPaginationCollections request, CancellationToken cancellationToken)
+        public async Task<object> Handle(GetPaginationCollections request, CancellationToken cancellationToken)
         {
             await ValidateRequest(request);
 
@@ -52,16 +52,26 @@ namespace IDonEnglist.Application.Features.Collections.Queries
                     include: (query) => query.Include(cl => cl.Thumbnail)
                 );
 
-            PaginatedList<CollectionViewModel> result = new PaginatedList<CollectionViewModel>
+            if (request.Filter.MinSize)
             {
-                Items = _mapper.Map<List<CollectionViewModel>>(paginatedCollections.Items),
-                PageIndex = paginatedCollections.PageIndex,
-                PageSize = paginatedCollections.PageSize,
-                TotalPages = paginatedCollections.TotalPages,
-                TotalRecords = paginatedCollections.TotalRecords,
-            };
-
-            return result;
+                var result = new PaginatedList<CollectionViewModelMin>(
+                    items: _mapper.Map<List<CollectionViewModelMin>>(paginatedCollections.Items),
+                    pageNumber: paginatedCollections.PageNumber,
+                    pageSize: paginatedCollections.PageSize,
+                    totalRecords: paginatedCollections.TotalRecords
+                );
+                return result;
+            }
+            else
+            {
+                var result = new PaginatedList<CollectionViewModel>(
+                    items: _mapper.Map<List<CollectionViewModel>>(paginatedCollections.Items),
+                    pageNumber: paginatedCollections.PageNumber,
+                    pageSize: paginatedCollections.PageSize,
+                    totalRecords: paginatedCollections.TotalRecords
+                );
+                return result;
+            }
         }
         private async Task ValidateRequest(GetPaginationCollections request)
         {

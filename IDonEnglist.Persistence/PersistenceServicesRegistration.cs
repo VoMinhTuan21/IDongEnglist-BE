@@ -23,6 +23,7 @@ namespace IDonEnglist.Persistence
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<IPermissionRepository, PermissionRepository>();
             services.AddScoped<ICategorySkillRepository, CategorySkillRepository>();
+            // not need add scope for repositories because I have config it in the unitOfWork
 
             return services;
         }
