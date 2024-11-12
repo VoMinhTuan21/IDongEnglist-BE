@@ -23,7 +23,7 @@ namespace IDonEnglist.API.Controllers
             _mediator = mediator;
         }
         [HttpPost]
-        public async Task<ActionResult<FinalTestViewModel>> Create([FromBody] CreateFinalTestDTO createData)
+        public async Task<ActionResult<int>> Create([FromBody] CreateFinalTestDTO createData)
         {
             var command = new CreateFinalTest
             {
@@ -45,6 +45,37 @@ namespace IDonEnglist.API.Controllers
             };
 
             var result = await _mediator.Send(query);
+            return Ok(result);
+        }
+
+        [HttpPut]
+        public async Task<ActionResult<int>> Update([FromBody] UpdateFinalTestDTO updateData)
+        {
+            var command = new UpdateFinalTest
+            {
+                UpdateData = updateData,
+                CurrentUser = GetUserFromToken()
+            };
+
+            var result = await _mediator.Send<int>(command);
+
+            return Ok(result);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<int>> Delete([FromRoute] int id)
+        {
+            var command = new DeleteFinalTest
+            {
+                DeleteData = new Application.DTOs.Common.BaseDTO
+                {
+                    Id = id
+                },
+                CurrentUser = GetUserFromToken()
+            };
+
+            var result = await _mediator.Send<int>(command);
+
             return Ok(result);
         }
     }

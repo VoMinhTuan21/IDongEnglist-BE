@@ -5,20 +5,19 @@ using IDonEnglist.Application.Exceptions;
 using IDonEnglist.Application.Models.Identity;
 using IDonEnglist.Application.Persistence.Contracts;
 using IDonEnglist.Application.Utils;
-using IDonEnglist.Application.ViewModels.FinalTest;
 using IDonEnglist.Domain;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace IDonEnglist.Application.Features.FinalTests.Commands
 {
-    public class CreateFinalTest : IRequest<FinalTestViewModel>
+    public class CreateFinalTest : IRequest<int>
     {
         public CreateFinalTestDTO CreateData { get; set; }
         public CurrentUser CurrentUser { get; set; }
     }
 
-    public class CreateFinalTestHandler : IRequestHandler<CreateFinalTest, FinalTestViewModel>
+    public class CreateFinalTestHandler : IRequestHandler<CreateFinalTest, int>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -28,7 +27,7 @@ namespace IDonEnglist.Application.Features.FinalTests.Commands
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public async Task<FinalTestViewModel> Handle(CreateFinalTest request, CancellationToken cancellationToken)
+        public async Task<int> Handle(CreateFinalTest request, CancellationToken cancellationToken)
         {
             await _unitOfWork.BeginTransactionAsync();
             try
@@ -47,7 +46,7 @@ namespace IDonEnglist.Application.Features.FinalTests.Commands
 
                 await _unitOfWork.CommitTransactionAsync();
 
-                return _mapper.Map<FinalTestViewModel>(finalTest);
+                return finalTest.Id;
             }
             catch (Exception)
             {

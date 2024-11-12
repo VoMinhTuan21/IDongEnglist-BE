@@ -100,6 +100,7 @@ namespace IDonEnglist.Application.Profiles
             CreateMap<FinalTest, FinalTestDTO>().ReverseMap();
             CreateMap<CreateFinalTestDTO, FinalTest>();
             CreateMap<FinalTest, FinalTestViewModel>();
+            CreateMap<UpdateFinalTestDTO, FinalTest>();
             #endregion
 
             #region media
