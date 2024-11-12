@@ -46,7 +46,7 @@ namespace IDonEnglist.Application.Features.TestTypes.Queries
             var result = new PaginatedList<TestTypeItemListViewModel>
             {
                 Items = _mapper.Map<List<TestTypeItemListViewModel>>(paginatedTestTypes.Items),
-                PageIndex = paginatedTestTypes.PageIndex,
+                PageNumber = paginatedTestTypes.PageNumber,
                 PageSize = paginatedTestTypes.PageSize,
                 TotalPages = paginatedTestTypes.TotalPages,
                 TotalRecords = paginatedTestTypes.TotalRecords,

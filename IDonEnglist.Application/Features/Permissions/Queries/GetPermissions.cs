@@ -29,7 +29,7 @@ namespace IDonEnglist.Application.Features.Permissions.Queries
             var result = new PaginatedList<PermissionViewModel>
             {
                 Items = _mapper.Map<List<PermissionViewModel>>(permissions.Items),
-                PageIndex = permissions.PageIndex,
+                PageNumber = permissions.PageNumber,
                 PageSize = permissions.PageSize,
                 TotalPages = permissions.TotalPages,
                 TotalRecords = permissions.TotalRecords,

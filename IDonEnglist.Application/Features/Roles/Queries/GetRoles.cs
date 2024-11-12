@@ -65,7 +65,7 @@ namespace IDonEnglist.Application.Features.Roles.Queries
             var result = new PaginatedList<RoleViewModel>
             {
                 PageSize = pagedList.PageSize,
-                PageIndex = pagedList.PageIndex,
+                PageNumber = pagedList.PageNumber,
                 TotalRecords = pagedList.TotalRecords,
                 TotalPages = pagedList.TotalPages,
                 Items = _mapper.Map<List<RoleViewModel>>(pagedList.Items)

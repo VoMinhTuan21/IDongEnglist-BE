@@ -28,6 +28,7 @@ using IDonEnglist.Application.DTOs.UserSocialAccount;
 using IDonEnglist.Application.ViewModels.Category;
 using IDonEnglist.Application.ViewModels.CategorySkill;
 using IDonEnglist.Application.ViewModels.Collection;
+using IDonEnglist.Application.ViewModels.FinalTest;
 using IDonEnglist.Application.ViewModels.Media;
 using IDonEnglist.Application.ViewModels.Permission;
 using IDonEnglist.Application.ViewModels.Role;
@@ -92,9 +93,15 @@ namespace IDonEnglist.Application.Profiles
                 });
             CreateMap<Collection, CollectionViewModel>()
                 .ForMember(dest => dest.Thumbnail, opt => opt.MapFrom(src => src.Thumbnail.Url));
+            CreateMap<Collection, CollectionViewModelMin>();
             #endregion
 
+            #region final test
             CreateMap<FinalTest, FinalTestDTO>().ReverseMap();
+            CreateMap<CreateFinalTestDTO, FinalTest>();
+            CreateMap<FinalTest, FinalTestViewModel>();
+            CreateMap<UpdateFinalTestDTO, FinalTest>();
+            #endregion
 
             #region media
             CreateMap<Media, MediaDTO>().ReverseMap();

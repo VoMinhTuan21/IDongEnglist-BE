@@ -13,6 +13,7 @@
         IRefreshTokenRepository RefreshTokenRepository { get; }
         ITestTypeRepository TestTypeRepository { get; }
         ITestPartRepository TestPartRepository { get; }
+        IFinalTestRepository FinalTestRepository { get; }
         Task Save();
         Task CommitTransactionAsync();
         Task RollbackTransactionAsync();

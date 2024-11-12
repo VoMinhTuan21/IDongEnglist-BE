@@ -1,7 +1,6 @@
 ﻿using IDonEnglist.Application.DTOs.Collection;
 using IDonEnglist.Application.Features.Collections.Commands;
 using IDonEnglist.Application.Features.Collections.Queries;
-using IDonEnglist.Application.Models.Pagination;
 using IDonEnglist.Application.ViewModels.Collection;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -22,7 +21,8 @@ namespace IDonEnglist.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<PaginatedList<CollectionViewModel>>> GetPagination([FromQuery] GetPaginationCollectionsDTO filter)
+        // This function return type is PaginatedList<CollectionViewModel> or PaginatedList<CollectionViewModelMin>
+        public async Task<ActionResult<object>> GetPagination([FromQuery] GetPaginationCollectionsDTO filter)
         {
             var query = new GetPaginationCollections { Filter = filter };
             var result = await _mediator.Send(query);

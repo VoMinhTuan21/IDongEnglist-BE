@@ -19,6 +19,7 @@ namespace IDonEnglist.Persistence.Repositories
         private IRefreshTokenRepository _refreshTokenRepository;
         private ITestPartRepository _testPartRepository;
         private ITestTypeRepository _testTypeRepository;
+        private IFinalTestRepository _finalTestRepository;
 
         public UnitOfWork(IDonEnglistDBContext context)
         {
@@ -121,6 +122,15 @@ namespace IDonEnglist.Persistence.Repositories
             {
                 _testPartRepository ??= new TestPartRepository(_dbContext);
                 return _testPartRepository;
+            }
+        }
+
+        public IFinalTestRepository FinalTestRepository
+        {
+            get
+            {
+                _finalTestRepository ??= new FinalTestRepository(_dbContext);
+                return _finalTestRepository;
             }
         }
 
