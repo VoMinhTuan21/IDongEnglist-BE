@@ -32,6 +32,7 @@ using IDonEnglist.Application.ViewModels.FinalTest;
 using IDonEnglist.Application.ViewModels.Media;
 using IDonEnglist.Application.ViewModels.Permission;
 using IDonEnglist.Application.ViewModels.Role;
+using IDonEnglist.Application.ViewModels.Test;
 using IDonEnglist.Application.ViewModels.TestPart;
 using IDonEnglist.Application.ViewModels.TestType;
 using IDonEnglist.Application.ViewModels.User;
@@ -55,6 +56,7 @@ namespace IDonEnglist.Application.Profiles
                 .ForMember(s => s.Skills, opt => opt.Ignore())
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<Category, CategoryViewModel>()
+                .ForMember(dest => dest.Skills, opt => opt.MapFrom(src => src.Skills.Select(sk => new CategorySkillMiniViewModel { Id = sk.Id, Skill = sk.Skill })))
                 .ForAllMembers(opts =>
                 {
                     opts.AllowNull();
@@ -101,6 +103,7 @@ namespace IDonEnglist.Application.Profiles
             CreateMap<CreateFinalTestDTO, FinalTest>();
             CreateMap<FinalTest, FinalTestViewModel>();
             CreateMap<UpdateFinalTestDTO, FinalTest>();
+            CreateMap<FinalTest, FinalTestViewModelMin>();
             #endregion
 
             #region media
@@ -162,7 +165,11 @@ namespace IDonEnglist.Application.Profiles
             #endregion
 
             CreateMap<RolePermission, RolePermissionDTO>().ReverseMap();
+
+            #region test
             CreateMap<Test, TestDTO>().ReverseMap();
+            CreateMap<Test, TestMinViewModel>();
+            #endregion
 
             #region test part
             CreateMap<TestPart, TestPartDTO>().ReverseMap();

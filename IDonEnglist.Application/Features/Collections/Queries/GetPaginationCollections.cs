@@ -45,6 +45,27 @@ namespace IDonEnglist.Application.Features.Collections.Queries
                 filter = filter.And(cl => keywords.All(k => cl.Name.ToLower().Contains(k)));
             }
 
+            if (request.Filter.ForCreateTest)
+            {
+                var categoryHasConfigured =
+                    (await _unitOfWork.CategoryRepository.GetAllListAsync(
+                         filter: c =>
+                             c.ParentId != null &&
+                             c.Skills
+                                 .Where(ck => ck.DeletedBy == null && ck.DeletedDate == null)
+                                 .All(ck => ck.DeletedBy == null && ck.DeletedDate == null &&
+                                            ck.TestTypes.Any(tt => tt.DeletedDate == null &&
+                                                                   tt.DeletedBy == null))
+
+                    )).Select(c => c.Id);
+
+                filter = filter.And(
+                    cl => cl.FinalTests != null && cl.FinalTests.Count() > 0 &&
+                          cl.FinalTests.Any(
+                              ft => ft.DeletedBy == null && ft.DeletedBy == null &&
+                                    categoryHasConfigured.Contains(cl.CategoryId)));
+            }
+
             var paginatedCollections = await _unitOfWork.CollectionRepository.GetPaginatedListAsync(
                     filter: filter,
                     pageNumber: request.Filter.PageNumber,

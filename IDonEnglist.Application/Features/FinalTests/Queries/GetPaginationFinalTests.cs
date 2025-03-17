@@ -13,12 +13,12 @@ using System.Linq.Expressions;
 
 namespace IDonEnglist.Application.Features.FinalTests.Queries
 {
-    public class GetPaginationFinalTests : IRequest<PaginatedList<FinalTestViewModel>>
+    public class GetPaginationFinalTests : IRequest<object>
     {
         public GetPaginationFinalTestsDTO FilterData { get; set; }
     }
 
-    public class GetPaginationFinalTestsHandler : IRequestHandler<GetPaginationFinalTests, PaginatedList<FinalTestViewModel>>
+    public class GetPaginationFinalTestsHandler : IRequestHandler<GetPaginationFinalTests, object>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -28,7 +28,7 @@ namespace IDonEnglist.Application.Features.FinalTests.Queries
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public async Task<PaginatedList<FinalTestViewModel>> Handle(GetPaginationFinalTests request, CancellationToken cancellationToken)
+        public async Task<object> Handle(GetPaginationFinalTests request, CancellationToken cancellationToken)
         {
             await ValidateRequest(request);
 
@@ -45,6 +45,27 @@ namespace IDonEnglist.Application.Features.FinalTests.Queries
                 filter = filter.And(cl => keywords.All(k => cl.Name.ToLower().Contains(k)));
             }
 
+            if (request.FilterData.ForCreateTest)
+            {
+                var testTypeIds =
+                    (await _unitOfWork.CollectionRepository.GetByIdAsync(
+                         request.FilterData.CollectionId ?? 0,
+                         query => query.Include(c => c.Category)
+                                      .ThenInclude(c => c.Skills)
+                                      .ThenInclude(ck => ck.TestTypes.Where(
+                                                       tt => tt.DeletedBy == null &&
+                                                             tt.DeletedDate == null))))
+                        ?.Category?.Skills?.Select(ck => ck.TestTypes?[0]?.Id) ??
+                    [];
+
+                filter = filter.And(
+                    ft => !(ft.Tests.Where(t => t.DeletedBy == null && t.DeletedDate == null)
+                                .All(t => testTypeIds.Contains(t.TestTypeId)) &&
+                            ft.Tests.Where(t => t.DeletedBy == null && t.DeletedDate == null)
+                                    .Count() == testTypeIds.Count()));
+            }
+
+
             var paginatedFinalTests = await _unitOfWork.FinalTestRepository.GetPaginatedListAsync(
                     filter: filter,
                     pageNumber: request.FilterData.PageNumber,
@@ -52,16 +73,32 @@ namespace IDonEnglist.Application.Features.FinalTests.Queries
                     include: ft => ft.Include(p => p.Collection)
                 );
 
-            PaginatedList<FinalTestViewModel> result = new PaginatedList<FinalTestViewModel>
+            if (request.FilterData.ForCreateTest)
             {
-                Items = _mapper.Map<List<FinalTestViewModel>>(paginatedFinalTests.Items),
-                PageNumber = paginatedFinalTests.PageNumber,
-                PageSize = paginatedFinalTests.PageSize,
-                TotalPages = paginatedFinalTests.TotalPages,
-                TotalRecords = paginatedFinalTests.TotalRecords,
-            };
+                PaginatedList<FinalTestViewModelMin> result = new PaginatedList<FinalTestViewModelMin>
+                {
+                    Items = _mapper.Map<List<FinalTestViewModelMin>>(paginatedFinalTests.Items),
+                    PageNumber = paginatedFinalTests.PageNumber,
+                    PageSize = paginatedFinalTests.PageSize,
+                    TotalPages = paginatedFinalTests.TotalPages,
+                    TotalRecords = paginatedFinalTests.TotalRecords,
+                };
 
-            return result;
+                return result;
+            }
+            else
+            {
+                PaginatedList<FinalTestViewModel> result = new PaginatedList<FinalTestViewModel>
+                {
+                    Items = _mapper.Map<List<FinalTestViewModel>>(paginatedFinalTests.Items),
+                    PageNumber = paginatedFinalTests.PageNumber,
+                    PageSize = paginatedFinalTests.PageSize,
+                    TotalPages = paginatedFinalTests.TotalPages,
+                    TotalRecords = paginatedFinalTests.TotalRecords,
+                };
+
+                return result;
+            }
         }
         private async Task ValidateRequest(GetPaginationFinalTests request)
         {

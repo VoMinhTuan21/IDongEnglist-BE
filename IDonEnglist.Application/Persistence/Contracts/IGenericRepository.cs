@@ -26,5 +26,6 @@ namespace IDonEnglist.Application.Persistence.Contracts
         Task<bool> ExistsAsync(int id);
         Task AddRangeAsync(IEnumerable<T> entities, CurrentUser currentUser);
         Task UpdateRangeAsync(IEnumerable<T> entities, CurrentUser currentUser);
+        Task DeleteRangeAsync(List<int> ids, CurrentUser currentUser);
     }
 }

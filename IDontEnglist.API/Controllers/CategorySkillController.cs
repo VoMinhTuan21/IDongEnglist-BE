@@ -1,5 +1,6 @@
 ﻿using IDonEnglist.Application.DTOs.CategorySkill;
 using IDonEnglist.Application.Features.CategorySkills.Commands;
+using IDonEnglist.Application.Features.CategorySkills.Queries;
 using IDonEnglist.Application.ViewModels.CategorySkill;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -39,6 +40,26 @@ namespace IDonEnglist.API.Controllers
             var deletedId = await _mediator.Send(new DeleteCategorySkill { Id = id, CurrentUser = currentUser });
 
             return Ok(new { Id = deletedId });
+        }
+
+        [HttpGet("list")]
+        public async Task<ActionResult<List<CategorySkillMiniViewModel>>> GetList([FromQuery] GetListCategorySkillsDTO filter)
+        {
+            var query = new GetListCategorySkills
+            {
+                Fitler = filter
+            };
+
+            var result = await _mediator.Send(query);
+
+            return Ok(result);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<CategorySkillViewModel>> Get(int id)
+        {
+            var result = await _mediator.Send(new GetCategorySkillDetail { Id = id });
+            return Ok(result);
         }
     }
 }

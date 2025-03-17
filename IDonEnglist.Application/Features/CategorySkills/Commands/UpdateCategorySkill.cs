@@ -45,7 +45,7 @@ namespace IDonEnglist.Application.Features.CategorySkills.Commands
                 // Mark skills for deletion
                 foreach (var item in skillsToDelete)
                 {
-                    await _unitOfWork.CategorySkillRepository.UpdateAsync(item, request.CurrentUser);
+                    await _unitOfWork.CategorySkillRepository.DeleteAsync(item.Id, request.CurrentUser);
                 }
 
                 // Add new skills

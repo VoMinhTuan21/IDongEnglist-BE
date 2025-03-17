@@ -14,6 +14,7 @@
         ITestTypeRepository TestTypeRepository { get; }
         ITestPartRepository TestPartRepository { get; }
         IFinalTestRepository FinalTestRepository { get; }
+        ITestRepository TestRepository { get; }
         Task Save();
         Task CommitTransactionAsync();
         Task RollbackTransactionAsync();

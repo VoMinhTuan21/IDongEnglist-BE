@@ -36,7 +36,9 @@ namespace IDonEnglist.Application.Features.FinalTests.Commands
 
                 var temp = _mapper.Map<FinalTest>(request.CreateData);
 
-                temp.Code = SlugGenerator.GenerateSlug(request.CreateData.Name);
+                var count = await _unitOfWork.FinalTestRepository.GetAllListAsync(ft => ft.CollectionId == temp.CollectionId);
+
+                temp.Code = SlugGenerator.GenerateSlug($"Test {count.Count() + 1}");
 
                 await _unitOfWork.FinalTestRepository.AddAsync(temp);
                 await _unitOfWork.Save();
@@ -62,13 +64,6 @@ namespace IDonEnglist.Application.Features.FinalTests.Commands
             if (!validationResult.IsValid)
             {
                 throw new ValidatorException(validationResult);
-            }
-
-            var existed = await _unitOfWork.FinalTestRepository.GetOneAsync(p => p.Code == SlugGenerator.GenerateSlug(request.CreateData.Name));
-
-            if (existed is not null)
-            {
-                throw new BadRequestException("Please use another name.");
             }
 
             _ = await _unitOfWork.CollectionRepository.GetByIdAsync(request.CreateData.CollectionId)

@@ -1,5 +1,4 @@
-﻿using IDonEnglist.Application.DTOs.Common;
-using IDonEnglist.Application.DTOs.Pagination;
+﻿using IDonEnglist.Application.DTOs.Pagination;
 using IDonEnglist.Application.DTOs.TestType;
 using IDonEnglist.Application.Features.TestTypes.Commands;
 using IDonEnglist.Application.Features.TestTypes.Queries;
@@ -23,8 +22,9 @@ namespace IDonEnglist.API.Controllers
         {
             _mediator = mediator;
         }
+
         [HttpPost]
-        public async Task<ActionResult<TestTypeItemListViewModel>> Post([FromBody] CreateTestTypeDTO createData)
+        public async Task<ActionResult<TestTypeDetailViewModel>> Post([FromBody] CreateTestTypeDTO createData)
         {
             var currentUser = GetUserFromToken();
             var command = new CreateTestType { CreateData = createData, CurrentUser = currentUser };
@@ -42,12 +42,12 @@ namespace IDonEnglist.API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<TestTypeDetailViewModel>> GetDetail([FromRoute] int id)
+        [HttpGet("detail")]
+        public async Task<ActionResult<TestTypeDetailViewModel>> GetDetail([FromQuery] GetTestTypeDetailDTO filter)
         {
             var query = new GetTestTypeDetail
             {
-                GetData = new BaseDTO { Id = id },
+                GetData = filter,
             };
 
             var result = await _mediator.Send(query);
@@ -55,7 +55,7 @@ namespace IDonEnglist.API.Controllers
         }
 
         [HttpPut]
-        public async Task<ActionResult<TestTypeItemListViewModel>> Update(UpdateTestTypeDTO updateData)
+        public async Task<ActionResult<TestTypeDetailViewModel>> Update(UpdateTestTypeDTO updateData)
         {
             var currentUser = GetUserFromToken();
             var command = new UpdateTestType { UpdateData = updateData, CurrentUser = currentUser };

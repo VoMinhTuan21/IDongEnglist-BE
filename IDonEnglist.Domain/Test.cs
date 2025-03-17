@@ -11,6 +11,8 @@ namespace IDonEnglist.Domain
         public int TestTaken { get; set; }
         public int FinalTestId { get; set; }
         public FinalTest FinalTest { get; set; }
+        public int TestTypeId { get; set; }
+        public TestType TestType { get; set; }
 
         public ICollection<TestSection> Sections { get; set; }
         public ICollection<TestTakenHistory> TestTakenHistories { get; set; }

@@ -13,13 +13,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IDonEnglist.Application.Features.TestTypes.Commands
 {
-    public class CreateTestType : IRequest<TestTypeItemListViewModel>
+    public class CreateTestType : IRequest<TestTypeDetailViewModel>
     {
         public CreateTestTypeDTO CreateData { get; set; }
         public CurrentUser CurrentUser { get; set; }
     }
 
-    public class CreateTestTypeHandler : IRequestHandler<CreateTestType, TestTypeItemListViewModel>
+    public class CreateTestTypeHandler : IRequestHandler<CreateTestType, TestTypeDetailViewModel>
     {
         private IUnitOfWork _unitOfWork;
         private IMapper _mapper;
@@ -31,7 +31,7 @@ namespace IDonEnglist.Application.Features.TestTypes.Commands
             _mapper = mapper;
             _meditor = mediator;
         }
-        public async Task<TestTypeItemListViewModel> Handle(CreateTestType request, CancellationToken cancellationToken)
+        public async Task<TestTypeDetailViewModel> Handle(CreateTestType request, CancellationToken cancellationToken)
         {
             await _unitOfWork.BeginTransactionAsync();
             try
@@ -61,12 +61,14 @@ namespace IDonEnglist.Application.Features.TestTypes.Commands
                 }, cancellationToken);
 
                 testType = await _unitOfWork.TestTypeRepository
-                    .GetByIdAsync(testType.Id, query => query.Include(t => t.CategorySkill)
-                                                             .ThenInclude(ck => ck.Category));
+                    .GetByIdAsync(id: testType.Id,
+                        include: query => query.Include(t => t.CategorySkill).ThenInclude(ck => ck.Category)
+                                              .Include(p => p.TestParts)
+                    );
 
                 await _unitOfWork.CommitTransactionAsync();
 
-                return _mapper.Map<TestTypeItemListViewModel>(testType);
+                return _mapper.Map<TestTypeDetailViewModel>(testType);
             }
             catch (Exception)
             {

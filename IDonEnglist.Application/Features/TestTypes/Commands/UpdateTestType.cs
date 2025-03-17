@@ -12,13 +12,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IDonEnglist.Application.Features.TestTypes.Commands
 {
-    public class UpdateTestType : IRequest<TestTypeItemListViewModel>
+    public class UpdateTestType : IRequest<TestTypeDetailViewModel>
     {
         public UpdateTestTypeDTO UpdateData { get; set; }
         public CurrentUser CurrentUser { get; set; }
     }
 
-    public class UpdateTestTypeHandler : IRequestHandler<UpdateTestType, TestTypeItemListViewModel>
+    public class UpdateTestTypeHandler : IRequestHandler<UpdateTestType, TestTypeDetailViewModel>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -30,14 +30,18 @@ namespace IDonEnglist.Application.Features.TestTypes.Commands
             _mapper = mapper;
             _mediator = mediator;
         }
-        public async Task<TestTypeItemListViewModel> Handle(UpdateTestType request, CancellationToken cancellationToken)
+        public async Task<TestTypeDetailViewModel> Handle(UpdateTestType request, CancellationToken cancellationToken)
         {
             await _unitOfWork.BeginTransactionAsync();
             try
             {
                 await ValidateRequest(request);
 
-                var oldTestType = await _unitOfWork.TestTypeRepository.GetByIdAsync(request.UpdateData.Id)
+                var oldTestType = await _unitOfWork.TestTypeRepository
+                        .GetByIdAsync(
+                            id: request.UpdateData.Id,
+                            include: query => query.Include(tt => tt.TestParts.Where(tp => tp.DeletedDate == null && tp.DeletedBy == null))
+                        )
                     ?? throw new NotFoundException(nameof(TestType), request.UpdateData.Id);
 
                 var updatedTestType = _mapper.Map(request.UpdateData, oldTestType);
@@ -51,17 +55,19 @@ namespace IDonEnglist.Application.Features.TestTypes.Commands
                 {
                     CurrentUser = request.CurrentUser,
                     TestTypeId = request.UpdateData.Id,
-                    UpdatedParts = request.UpdateData.Parts
+                    UpdatedParts = request.UpdateData.Parts,
+                    OldParts = [.. oldTestType.TestParts]
                 });
 
                 var testType = await _unitOfWork.TestTypeRepository.GetOneAsync(
-                    p => p.Id == request.UpdateData.Id, false,
-                    query => query.Include(tt => tt.CategorySkill).ThenInclude(ck => ck.Category)
+                    filter: p => p.Id == request.UpdateData.Id, false,
+                    include: query => query.Include(tt => tt.CategorySkill).ThenInclude(ck => ck.Category)
+                                            .Include(p => p.TestParts.Where(tp => tp.DeletedBy == null && tp.DeletedDate == null))
                 );
 
                 await _unitOfWork.CommitTransactionAsync();
 
-                return _mapper.Map<TestTypeItemListViewModel>(testType);
+                return _mapper.Map<TestTypeDetailViewModel>(testType);
             }
             catch (Exception ex)
             {

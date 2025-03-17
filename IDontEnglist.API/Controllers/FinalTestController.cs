@@ -1,8 +1,6 @@
 ﻿using IDonEnglist.Application.DTOs.FinalTest;
 using IDonEnglist.Application.Features.FinalTests.Commands;
 using IDonEnglist.Application.Features.FinalTests.Queries;
-using IDonEnglist.Application.Models.Pagination;
-using IDonEnglist.Application.ViewModels.FinalTest;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -37,7 +35,8 @@ namespace IDonEnglist.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<PaginatedList<FinalTestViewModel>>> GetPagination([FromQuery] GetPaginationFinalTestsDTO filter)
+        // This API return PaginatedList<FinalTestViewModelMin> or PaginatedList<FinalTestViewModel>
+        public async Task<ActionResult<object>> GetPagination([FromQuery] GetPaginationFinalTestsDTO filter)
         {
             var query = new GetPaginationFinalTests
             {

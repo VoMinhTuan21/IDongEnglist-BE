@@ -1,9 +1,10 @@
 ﻿using AutoMapper;
-using IDonEnglist.Application.DTOs.Common;
-using IDonEnglist.Application.DTOs.Common.Validator;
+using IDonEnglist.Application.DTOs.TestType;
+using IDonEnglist.Application.DTOs.TestType.validators;
 using IDonEnglist.Application.Exceptions;
 using IDonEnglist.Application.Persistence.Contracts;
 using IDonEnglist.Application.ViewModels.TestType;
+using IDonEnglist.Domain;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,7 +12,7 @@ namespace IDonEnglist.Application.Features.TestTypes.Queries
 {
     public class GetTestTypeDetail : IRequest<TestTypeDetailViewModel>
     {
-        public BaseDTO GetData { get; set; }
+        public GetTestTypeDetailDTO GetData { get; set; }
     }
 
     public class GetTestTypeDetailHandler : IRequestHandler<GetTestTypeDetail, TestTypeDetailViewModel>
@@ -28,11 +29,11 @@ namespace IDonEnglist.Application.Features.TestTypes.Queries
         {
             await ValidateRequest(request);
 
-            var testType = await _unitOfWork.TestTypeRepository.GetByIdAsync(
-                request.GetData.Id,
-                (query) => query.Include(p => p.CategorySkill).ThenInclude(ck => ck.Category)
-                                .Include(p => p.TestParts)
-            );
+            var testType = await _unitOfWork.TestTypeRepository.GetOneAsync(
+                filter: (tt) => tt.CategorySkillId == request.GetData.CategorySkillId,
+                include: (query) => query.Include(p => p.CategorySkill).ThenInclude(ck => ck.Category)
+                                .Include(p => p.TestParts.Where(tp => tp.DeletedBy == null && tp.DeletedDate == null))
+            ) ?? throw new NotFoundException(nameof(TestType), request.GetData);
 
             var result = _mapper.Map<TestTypeDetailViewModel>(testType);
 
@@ -41,7 +42,7 @@ namespace IDonEnglist.Application.Features.TestTypes.Queries
 
         private async Task ValidateRequest(GetTestTypeDetail request)
         {
-            var validator = new BaseDTOValidator();
+            var validator = new GetTestTypeDetailDTOValidator();
             var validationResult = await validator.ValidateAsync(request.GetData);
 
             if (!validationResult.IsValid)

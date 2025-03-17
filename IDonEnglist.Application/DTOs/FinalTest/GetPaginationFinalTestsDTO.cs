@@ -6,5 +6,6 @@ namespace IDonEnglist.Application.DTOs.FinalTest
     {
         public int? CollectionId { get; set; }
         public string? Keywords { get; set; }
+        public bool ForCreateTest { get; set; } = false;
     }
 }

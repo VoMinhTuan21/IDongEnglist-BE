@@ -175,5 +175,20 @@ namespace IDonEnglist.Persistence.Repositories
 
             return Task.CompletedTask;
         }
+
+        public Task DeleteRangeAsync(List<int> ids, CurrentUser currentUser)
+        {
+            for (int i = 0; i < ids.Count; i++)
+            {
+                var entity = _dbContext.Set<T>().Find(ids[i]);
+                if (entity != null)
+                {
+                    entity.DeletedBy = currentUser.Id;
+                    entity.DeletedDate = DateTime.UtcNow;
+                    _dbContext.Entry(entity).State = EntityState.Modified;
+                }
+            }
+            return Task.CompletedTask;
+        }
     }
 }
